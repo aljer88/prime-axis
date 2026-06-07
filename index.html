@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Prime Axis — Property Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
+<meta name="theme-color" content="#1d4ed8"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Prime Axis"/>
+<meta name="description" content="Prime Axis — Property Management System"/>
+<link rel="manifest" id="pwa-manifest"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f4f8;
+  --surface:#ffffff;
+  --surface2:#f7f9fc;
+  --border:#dde3ed;
+  --border2:#e8edf5;
+  --text:#1a2236;
+  --muted:#7a8aaa;
+  --sub:#4a5872;
+  --accent:#1d4ed8;
+  --accent-light:#eff4ff;
+  --accent-hover:#1741c0;
+  --green:#0e9f6e;
+  --green-light:#ecfdf5;
+  --yellow:#d97706;
+  --yellow-light:#fffbeb;
+  --red:#dc2626;
+  --red-light:#fef2f2;
+  --purple:#7c3aed;
+  --purple-light:#f5f3ff;
+  --shadow:0 1px 4px rgba(30,50,100,.08),0 4px 16px rgba(30,50,100,.06);
+  --shadow-sm:0 1px 3px rgba(30,50,100,.07);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',sans-serif;font-size:15px;line-height:1.5}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:#c5cfe0;border-radius:4px}
+
+/* ── Buttons ── */
+.btn{cursor:pointer;border:none;border-radius:9px;font-family:inherit;font-size:14px;font-weight:600;padding:9px 18px;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(29,78,216,.3)}
+.btn-ghost{background:var(--surface);border:1.5px solid var(--border);color:var(--sub)}.btn-ghost:hover{border-color:#a0b0cc;color:var(--text);background:#f5f8ff}
+.btn-danger{background:var(--red-light);border:1.5px solid #fca5a5;color:var(--red)}.btn-danger:hover{background:#fee2e2}
+.btn-success{background:var(--green-light);border:1.5px solid #6ee7b7;color:var(--green)}.btn-success:hover{background:#d1fae5}
+.btn-sm{padding:6px 13px;font-size:13px;border-radius:7px}
+
+/* ── Inputs ── */
+input,select,textarea{background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:9px;padding:11px 14px;font-family:inherit;font-size:14px;width:100%;outline:none;transition:border-color .15s;box-shadow:var(--shadow-sm)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,78,216,.1)}
+input::placeholder{color:#b0bed4}
+select option{background:var(--surface);color:var(--text)}
+
+/* ── Cards ── */
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm)}
+
+/* ── Chips ── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+
+/* ── Filter buttons ── */
+.fb{cursor:pointer;padding:6px 15px;border-radius:20px;font-size:13px;font-weight:500;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);font-family:inherit;transition:all .15s}
+.fb.on{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 8px rgba(29,78,216,.2)}.fb:not(.on):hover{border-color:#a0b0cc;color:var(--sub);background:#f5f8ff}
+
+/* ── Overlay / Modal ── */
+.overlay{position:fixed;inset:0;background:rgba(15,25,50,.45);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:28px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(15,25,50,.18)}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:500;display:none;animation:up .3s ease;box-shadow:0 4px 16px rgba(29,78,216,.3)}
+@keyframes up{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── Progress bar ── */
+.pb{height:5px;background:var(--border2);border-radius:3px;overflow:hidden;margin-top:10px}
+.pf{height:100%;background:var(--accent);border-radius:3px;transition:width .5s}
+
+/* ── Login ── */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#e8eef8 0%,#f0f4f8 50%,#e8f0ff 100%)}
+.login-box{width:100%;max-width:400px}
+.login-card{background:var(--surface);border-radius:20px;padding:36px 32px;box-shadow:0 8px 40px rgba(15,25,50,.14);border:1.5px solid var(--border2)}
+
+/* ── App shell ── */
+#app{display:none;flex-direction:column;min-height:100vh}
+
+/* ── Header ── */
+#header{background:var(--surface);border-bottom:1.5px solid var(--border);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 6px rgba(30,50,100,.06)}
+
+/* ── Tabs ── */
+#tabs{background:var(--surface);border-bottom:1.5px solid var(--border);padding:0 22px;display:flex;gap:2px;overflow-x:auto;position:sticky;top:61px;z-index:99}
+.tab-btn{cursor:pointer;padding:12px 20px;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;border:none;border-bottom:3px solid transparent;background:transparent;color:var(--muted);transition:all .2s;white-space:nowrap}
+.tab-btn.on{color:var(--accent);border-bottom-color:var(--accent)}.tab-btn:hover:not(.on){color:var(--sub);background:var(--accent-light);border-radius:8px 8px 0 0}
+
+/* ── Content ── */
+#content{padding:22px;flex:1}
+
+/* ── Stat grid ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{padding:18px 20px}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.stat-val{font-family:'Manrope',sans-serif;font-size:26px;font-weight:800;line-height:1}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:5px;font-weight:500}
+
+/* ── Alert banners ── */
+.alert{border-radius:10px;padding:11px 16px;font-size:13px;font-weight:500;margin-bottom:10px;cursor:default;display:flex;align-items:center;gap:8px}
+
+/* ── Table rows ── */
+.row-hdr,.data-row{display:grid;gap:12px;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border2)}
+.row-hdr{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom-color:var(--border)}
+.data-row:last-child{border-bottom:none}.data-row:hover{background:var(--accent-light)}
+.data-row{cursor:pointer;transition:background .12s}
+
+/* ── Image viewer ── */
+#img-viewer{position:fixed;inset:0;background:rgba(10,15,30,.9);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#img-viewer img{max-width:100%;max-height:78vh;border-radius:12px;object-fit:contain;border:2px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+
+/* ── Upload area ── */
+.upload-area{border:2px dashed var(--border);border-radius:12px;padding:26px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2)}
+.upload-area:hover{border-color:var(--accent);background:var(--accent-light)}
+.check-thumb{width:100%;height:160px;object-fit:cover;border-radius:10px;border:1.5px solid var(--border);display:block;cursor:pointer;box-shadow:var(--shadow-sm)}
+
+/* ── Section label ── */
+.sl{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+
+/* ── Divider ── */
+.divider{height:1px;background:var(--border2);margin:16px 0}
+
+/* ── Contract doc list ── */
+.doc-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border2);margin-bottom:8px}
+.doc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.doc-icon.pdf{background:#fef2f2;color:#dc2626}
+.doc-icon.img{background:#eff4ff;color:#1d4ed8}
+.doc-icon.other{background:#f5f3ff;color:#7c3aed}
+
+/* ── PWA install banner ── */
+#install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--accent);color:#fff;padding:14px 20px;z-index:800;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(29,78,216,.25)}
+#install-banner button{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;padding:7px 16px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+#install-banner button.dismiss{background:transparent;border-color:rgba(255,255,255,.2);padding:7px 12px}
+
+/* ── Mobile bottom nav ── */
+@media(max-width:640px){
+  #bottom-nav{display:flex}
+  #tabs{display:none}
+  #content{padding-bottom:80px}
+}
+@media(min-width:641px){
+  #bottom-nav{display:none}
+}
+#bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1.5px solid var(--border);z-index:90;justify-content:space-around;padding:8px 0 env(safe-area-inset-bottom,0);box-shadow:0 -2px 12px rgba(30,50,100,.08)}
+.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;cursor:pointer;border:none;background:transparent;font-family:inherit;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.04em;transition:color .15s;min-width:60px}
+.bnav-btn.on{color:var(--accent)}
+.bnav-btn span.icon{font-size:20px;line-height:1}
+
+/* ── Mobile ── */
+@media(max-width:640px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .hide-xs{display:none!important}
+  #header{padding:12px 16px}
+  #content{padding:14px 16px}
+  .modal{padding:22px 18px}
+  #tabs{top:57px}
+}
+@media(max-width:420px){
+  .stat-val{font-size:22px}
+  .btn{font-size:13px;padding:8px 14px}
+}
+</style>
+<style>
+/* ── Firebase sync indicator ── */
+#sync-bar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);z-index:1000;display:none;transform-origin:left;animation:syncpulse 1.2s ease-in-out infinite}
+@keyframes syncpulse{0%{opacity:.4;transform:scaleX(.3)}50%{opacity:1;transform:scaleX(.7)}100%{opacity:.4;transform:scaleX(1)}}
+#cloud-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:12px;margin-left:6px;vertical-align:middle}
+#cloud-status.online{color:var(--green);background:var(--green-light)}
+#cloud-status.offline{color:var(--muted);background:var(--surface2)}
+#cloud-status.syncing{color:var(--accent);background:var(--accent-light)}
+#cloud-status.error{color:var(--red);background:var(--red-light)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ LOGIN SCREEN ══════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <!-- Logo above card -->
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-family:'Manrope',sans-serif;font-size:36px;font-weight:800;color:var(--accent);letter-spacing:-0.03em;line-height:1">
+        PRIME <span style="color:var(--text)">AXIS</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.12em;margin-top:6px">PROPERTY MANAGEMENT SYSTEM</div>
+    </div>
+
+    <div class="login-card">
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px">Welcome back</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:24px">Sign in to your account to continue</div>
+
+      <div id="login-err" style="display:none;background:var(--red-light);border:1.5px solid #fca5a5;border-radius:9px;padding:11px 14px;font-size:13px;color:var(--red);margin-bottom:16px;font-weight:500"></div>
+
+      <div style="margin-bottom:16px">
+        <div class="sl">USERNAME</div>
+        <input id="inp-user" type="text" placeholder="Enter your username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div style="margin-bottom:24px">
+        <div class="sl">PASSWORD</div>
+        <input id="inp-pass" type="password" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:15px" onclick="doLogin()">Sign In →</button>
+
+      <div style="margin-top:22px;padding:14px 16px;background:var(--accent-light);border:1.5px solid #bfcfef;border-radius:10px;font-size:13px;color:var(--sub);line-height:1.8">
+        <div style="color:var(--accent);margin-bottom:4px;font-size:11px;font-weight:700;letter-spacing:.08em">DEFAULT CREDENTIALS</div>
+        Admin: <span style="color:var(--text);font-weight:600">admin</span> / <span style="color:var(--text);font-weight:600">admin123</span><br/>
+        <span style="font-size:12px;color:var(--muted)">Staff accounts are managed by the administrator.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP SHELL ══════════════════ -->
+<div id="app">
+
+  <!-- Sync indicator -->
+  <div id="sync-bar"></div>
+
+  <!-- Header -->
+  <div id="header">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div>
+        <div style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em;color:var(--accent)">PRIME <span style="color:var(--text)">AXIS</span></div>
+        <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.1em">PROPERTY MANAGEMENT</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="hdr-user" style="font-size:13px;color:var(--muted);font-weight:500"></span>
+      <span id="cloud-status" class="offline" title="Cloud sync status">☁ Offline</span>
+      <span id="hdr-admin-btns" style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="showAddPdc()">+ PDC</button>
+        <button class="btn btn-primary btn-sm" onclick="showAddTenant()">+ Tenant</button>
+      </span>
+      <span id="hdr-staff-btn" style="display:none;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="showAddPdc()">+ PDC</button>
+        <button class="btn btn-primary btn-sm" onclick="showAddTenant()">+ Tenant</button>
+      </span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()" title="Sign out" style="padding:6px 10px">⏻</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div id="tabs">
+    <button class="tab-btn on" onclick="switchTab(0)">TENANTS</button>
+    <button class="tab-btn" id="tab-pdcs" onclick="switchTab(1)">POST-DATED CHECKS</button>
+    <button class="tab-btn" onclick="switchTab(2)" id="tab-settings">⚙ SETTINGS</button>
+  </div>
+
+  <!-- Content -->
+  <div id="content"></div>
+</div>
+
+<!-- PWA Install Banner -->
+<div id="install-banner">
+  <span style="font-size:18px">📱</span>
+  <div style="flex:1">
+    <div style="font-weight:700;font-size:14px">Install Prime Axis</div>
+    <div style="font-size:12px;opacity:.85">Add to Home Screen for quick access</div>
+  </div>
+  <button onclick="installPWA()">Install</button>
+  <button class="dismiss" onclick="dismissInstall()">✕</button>
+</div>
+
+<!-- Mobile Bottom Nav -->
+<div id="bottom-nav">
+  <button class="bnav-btn on" id="bnav-0" onclick="switchTab(0)"><span class="icon">🏠</span>Tenants</button>
+  <button class="bnav-btn" id="bnav-1" onclick="switchTab(1)"><span class="icon">📋</span>Checks</button>
+  <button class="bnav-btn" id="bnav-2" onclick="switchTab(2)"><span class="icon">⚙️</span>Settings</button>
+</div>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+<div class="overlay" id="modal-tenant-detail" style="display:none" onclick="if(event.target===this)closeModal('modal-tenant-detail')"><div class="modal" style="max-width:600px" id="modal-tenant-detail-body"></div></div>
+<div class="overlay" id="modal-add-tenant"    style="display:none" onclick="if(event.target===this)closeModal('modal-add-tenant')"><div class="modal" style="max-width:460px" id="modal-add-tenant-body"></div></div>
+<div class="overlay" id="modal-add-pdc"       style="display:none" onclick="if(event.target===this)closeModal('modal-add-pdc')"><div class="modal" style="max-width:500px" id="modal-add-pdc-body"></div></div>
+<div class="overlay" id="modal-pdc-detail"    style="display:none" onclick="if(event.target===this)closeModal('modal-pdc-detail')"><div class="modal" style="max-width:520px" id="modal-pdc-detail-body"></div></div>
+
+<!-- Add User Modal -->
+<div class="overlay" id="modal-add-user" style="display:none" onclick="if(event.target===this)closeModal('modal-add-user')"><div class="modal" style="max-width:440px" id="modal-add-user-body"></div></div>
+<!-- Change Password Modal -->
+<div class="overlay" id="modal-change-pw" style="display:none" onclick="if(event.target===this)closeModal('modal-change-pw')"><div class="modal" style="max-width:400px" id="modal-change-pw-body"></div></div>
+
+<!-- Contract viewer -->
+<div id="contract-viewer" style="position:fixed;inset:0;background:rgba(10,15,30,.9);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px" onclick="closeContractViewer()">
+  <div style="width:100%;max-width:720px;max-height:90vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-shrink:0">
+      <div id="cv-label" style="color:#93c5fd;font-size:14px;font-weight:600"></div>
+      <div style="display:flex;gap:8px">
+        <a id="cv-download" download style="text-decoration:none"><button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff">⬇ Download</button></a>
+        <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="closeContractViewer()">✕ Close</button>
+      </div>
+    </div>
+    <div id="cv-body" style="flex:1;overflow:auto;border-radius:12px;background:#fff"></div>
+    <div style="text-align:center;margin-top:8px;color:#94a3b8;font-size:12px">Tap outside to close</div>
+  </div>
+</div>
+
+<!-- Image viewer -->
+<div id="img-viewer" onclick="closeImgViewer()">
+  <div style="width:100%;max-width:700px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div id="img-viewer-label" style="color:#93c5fd;font-size:14px;font-weight:600"></div>
+      <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="closeImgViewer()">✕ Close</button>
+    </div>
+    <img id="img-viewer-img" src="" alt="Check"/>
+    <div style="text-align:center;margin-top:10px;color:#94a3b8;font-size:12px">Tap outside image to close</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  DATA & AUTH
+// ══════════════════════════════════════════════════════
+const USERS_KEY = 'primeaxis_users_v1';
+let USERS = {};
+
+function loadUsers() {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    if (raw) { USERS = JSON.parse(raw); return; }
+  } catch(e){}
+  USERS = {
+    admin: { password: 'admin123', role: 'admin', label: 'Admin' },
+    staff: { password: 'staff123', role: 'staff', label: 'Staff' },
+  };
+  saveUsers();
+}
+function saveUsers() {
+  try { localStorage.setItem(USERS_KEY, JSON.stringify(USERS)); } catch(e){}
+}
+
+const TODAY = new Date(); TODAY.setHours(0,0,0,0); // always today's real date, midnight local time
+const STORAGE_KEY = 'primeaxis_v4';
+
+// ── Seed data uses real current date offsets ─────────
+function _seedDate(monthOffset, day) {
+  const d = new Date(); d.setDate(day || 1);
+  d.setMonth(d.getMonth() + monthOffset);
+  return d.toISOString().slice(0,10);
+}
+const SEED_TENANTS = [
+  {id:1,name:'Juan dela Cruz',   unit:'1A',rent:18500,dueDate:1,lastPaid:_seedDate(-1,1), checkStatus:'deposited',   phone:'0917-555-0101',email:'j.delacruz@email.com', leaseStart:_seedDate(-7,1), leaseEnd:_seedDate(5,30),  contractDocs:[]},
+  {id:2,name:'Maria Santos',     unit:'1B',rent:16500,dueDate:1,lastPaid:_seedDate(-1,3), checkStatus:'pending',      phone:'0917-555-0102',email:'m.santos@email.com',   leaseStart:_seedDate(-4,1), leaseEnd:_seedDate(8,31),  contractDocs:[]},
+  {id:3,name:'Pedro Reyes',      unit:'2A',rent:21000,dueDate:1,lastPaid:_seedDate(-2,1), checkStatus:'not_received', phone:'0917-555-0103',email:'p.reyes@email.com',     leaseStart:_seedDate(-13,1),leaseEnd:_seedDate(11,31), contractDocs:[]},
+  {id:4,name:'Ana Gonzales',     unit:'2B',rent:19500,dueDate:5,lastPaid:_seedDate(-1,5), checkStatus:'deposited',   phone:'0917-555-0104',email:'a.gonzales@email.com',  leaseStart:_seedDate(-8,5), leaseEnd:_seedDate(4,31),  contractDocs:[]},
+  {id:5,name:'Roberto Bautista', unit:'3A',rent:24000,dueDate:1,lastPaid:_seedDate(-1,2), checkStatus:'deposited',   phone:'0917-555-0105',email:'r.bautista@email.com',  leaseStart:_seedDate(-3,1), leaseEnd:_seedDate(9,31),  contractDocs:[]},
+  {id:6,name:'Lina Villanueva',  unit:'3B',rent:17500,dueDate:1,lastPaid:_seedDate(-2,28),checkStatus:'not_received', phone:'0917-555-0106',email:'l.villanueva@email.com',leaseStart:_seedDate(-5,1), leaseEnd:_seedDate(7,30),  contractDocs:[]},
+];
+const SEED_PDCS = [
+  {id:1, tenantId:1,tenantName:'Juan dela Cruz',   unit:'1A',checkNo:'1042',amount:18500,checkDate:_seedDate(1,1), receivedDate:_seedDate(-1,1),status:'holding',  bank:'BDO',       memo:'Month +1 rent', checkImages:[]},
+  {id:2, tenantId:1,tenantName:'Juan dela Cruz',   unit:'1A',checkNo:'1043',amount:18500,checkDate:_seedDate(2,1), receivedDate:_seedDate(-1,1),status:'holding',  bank:'BDO',       memo:'Month +2 rent', checkImages:[]},
+  {id:3, tenantId:1,tenantName:'Juan dela Cruz',   unit:'1A',checkNo:'1044',amount:18500,checkDate:_seedDate(3,1), receivedDate:_seedDate(-1,1),status:'holding',  bank:'BDO',       memo:'Month +3 rent', checkImages:[]},
+  {id:4, tenantId:2,tenantName:'Maria Santos',     unit:'1B',checkNo:'2201',amount:16500,checkDate:_seedDate(1,1), receivedDate:_seedDate(-1,3),status:'holding',  bank:'BPI',       memo:'Month +1 rent', checkImages:[]},
+  {id:5, tenantId:2,tenantName:'Maria Santos',     unit:'1B',checkNo:'2202',amount:16500,checkDate:_seedDate(2,1), receivedDate:_seedDate(-1,3),status:'holding',  bank:'BPI',       memo:'Month +2 rent', checkImages:[]},
+  {id:6, tenantId:4,tenantName:'Ana Gonzales',     unit:'2B',checkNo:'5510',amount:19500,checkDate:_seedDate(1,5), receivedDate:_seedDate(-1,5),status:'holding',  bank:'Metrobank', memo:'Month +1 rent', checkImages:[]},
+  {id:7, tenantId:4,tenantName:'Ana Gonzales',     unit:'2B',checkNo:'5511',amount:19500,checkDate:_seedDate(2,5), receivedDate:_seedDate(-1,5),status:'holding',  bank:'Metrobank', memo:'Month +2 rent', checkImages:[]},
+  {id:8, tenantId:4,tenantName:'Ana Gonzales',     unit:'2B',checkNo:'5512',amount:19500,checkDate:_seedDate(3,5), receivedDate:_seedDate(-1,5),status:'holding',  bank:'Metrobank', memo:'Month +3 rent', checkImages:[]},
+  {id:9, tenantId:5,tenantName:'Roberto Bautista', unit:'3A',checkNo:'8801',amount:24000,checkDate:_seedDate(1,1), receivedDate:_seedDate(-1,2),status:'holding',  bank:'UnionBank', memo:'Month +1 rent', checkImages:[]},
+  {id:10,tenantId:5,tenantName:'Roberto Bautista', unit:'3A',checkNo:'8802',amount:24000,checkDate:_seedDate(2,1), receivedDate:_seedDate(-1,2),status:'holding',  bank:'UnionBank', memo:'Month +2 rent', checkImages:[]},
+  {id:11,tenantId:5,tenantName:'Roberto Bautista', unit:'3A',checkNo:'8803',amount:24000,checkDate:_seedDate(3,1), receivedDate:_seedDate(-1,2),status:'deposited',bank:'UnionBank', memo:'Month +3 rent', checkImages:[],depositedDate:_seedDate(0,10)},
+  {id:12,tenantId:3,tenantName:'Pedro Reyes',      unit:'2A',checkNo:'3305',amount:21000,checkDate:_seedDate(0,15),receivedDate:_seedDate(-1,1),status:'bounced',  bank:'PNB',       memo:'This month rent',checkImages:[]},
+];
+
+// ── State ──────────────────────────────────────────────
+let currentUser = null;
+let db = { tenants: [], pdcs: [] };
+let activeTab = 0;
+let tenantFilter = 'all';
+let pdcFilter = 'all';
+let pdcSort = 'date';
+let _addPdcPreselect = null;
+
+// ══════════════════════════════════════════════════════
+//  STORAGE ENGINE
+//  PRIMARY:  Firebase Firestore (structured data)
+//            Firebase Storage  (binary files)
+//  FALLBACK: IndexedDB cache   (offline support)
+//
+//  ┌─────────────────────────────────────────────┐
+//  │  HOW TO ENABLE CLOUD SYNC                   │
+//  │  1. Go to console.firebase.google.com       │
+//  │  2. Create a project → Add Web App          │
+//  │  3. Copy your firebaseConfig values below   │
+//  │  4. Enable Firestore + Storage in console   │
+//  └─────────────────────────────────────────────┘
+// ══════════════════════════════════════════════════════
+
+// ── Firebase configuration ─────────────────────────────
+// REPLACE these placeholder values with your own Firebase config
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAQSgt7bcRkarqvcCKGNEynur3cSoNimF8",
+  authDomain: "prime-axis-88.firebaseapp.com",
+  projectId: "prime-axis-88",
+  storageBucket: "prime-axis-88.firebasestorage.app",
+  messagingSenderId: "8099162662",
+  appId: "1:8099162662:web:b5f1ba61ce8010093a54e7"
+};
+
+// Detect if Firebase is configured (all placeholders replaced)
+const FIREBASE_ENABLED = !Object.values(FIREBASE_CONFIG).some(v => v.startsWith('PASTE_'));
+
+// ── Firebase SDK (loaded dynamically if configured) ────
+let _fsdb = null;   // Firestore db instance
+let _fstore = null; // Firebase Storage instance
+let _firebaseReady = false;
+
+async function initFirebase() {
+  if (!FIREBASE_ENABLED) { setCloudStatus('offline','☁ Local only'); return; }
+  try {
+    // Load Firebase SDKs from CDN
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js');
+    const app = firebase.initializeApp(FIREBASE_CONFIG);
+    _fsdb    = firebase.firestore();
+    _fstore  = firebase.storage();
+    // Enable offline persistence (Firestore caches locally for offline)
+    await _fsdb.enablePersistence({synchronizeTabs: true}).catch(()=>{});
+    _firebaseReady = true;
+    setCloudStatus('online','☁ Cloud synced');
+    // Start real-time listener
+    startRealtimeSync();
+    console.info('[PrimeAxis] Firebase ready — cloud sync active');
+  } catch(e) {
+    console.warn('[PrimeAxis] Firebase init failed:', e);
+    setCloudStatus('error','☁ Sync error');
+  }
+}
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+// ── Cloud status indicator ──────────────────────────────
+function setCloudStatus(cls, label) {
+  const el = document.getElementById('cloud-status');
+  if (el) { el.className = 'cloud-status ' + cls; el.textContent = label; }
+}
+function showSyncBar(show) {
+  const el = document.getElementById('sync-bar');
+  if (el) el.style.display = show ? 'block' : 'none';
+}
+
+// ── Real-time listener: Firestore → local ──────────────
+let _unsubTenants = null, _unsubPdcs = null;
+function startRealtimeSync() {
+  if (!_firebaseReady) return;
+  // Listen to tenants collection
+  _unsubTenants = _fsdb.collection('tenants').onSnapshot(snap => {
+    const tenants = snap.docs.map(d => ({id: d.id, ...d.data()}))
+      .map(t => ({...t, contractDocs: t.contractDocs||[]}));
+    if (tenants.length > 0 || db.tenants.length === 0) {
+      db.tenants = tenants;
+      saveLocalCache();
+      if (activeTab === 0) renderTab();
+    }
+    setCloudStatus('online','☁ Cloud synced');
+  }, err => {
+    console.warn('Tenant listener error:', err);
+    setCloudStatus('error','☁ Sync error');
+  });
+  // Listen to pdcs collection
+  _unsubPdcs = _fsdb.collection('pdcs').onSnapshot(snap => {
+    const pdcs = snap.docs.map(d => ({id: d.id, ...d.data()}))
+      .map(p => ({...p, checkImages: p.checkImages||[]}));
+    if (pdcs.length > 0 || db.pdcs.length === 0) {
+      db.pdcs = pdcs;
+      saveLocalCache();
+      if (activeTab === 1) renderTab();
+    }
+  }, err => console.warn('PDC listener error:', err));
+}
+
+// ── saveDB: write to Firestore (with IDB cache fallback) ─
+async function saveDB() {
+  saveLocalCache(); // always save locally first (instant)
+  if (!_firebaseReady) return;
+  showSyncBar(true);
+  setCloudStatus('syncing','☁ Syncing…');
+  try {
+    const batch = _fsdb.batch();
+    // Write all tenants
+    db.tenants.forEach(t => {
+      const ref = _fsdb.collection('tenants').doc(String(t.id));
+      batch.set(ref, sanitizeForFirestore(t));
+    });
+    // Write all PDCs
+    db.pdcs.forEach(p => {
+      const ref = _fsdb.collection('pdcs').doc(String(p.id));
+      batch.set(ref, sanitizeForFirestore(p));
+    });
+    await batch.commit();
+    setCloudStatus('online','☁ Cloud synced');
+  } catch(e) {
+    console.warn('Firestore save failed:', e);
+    setCloudStatus('error','☁ Save failed');
+  } finally {
+    showSyncBar(false);
+  }
+}
+
+// Remove undefined values Firestore rejects
+function sanitizeForFirestore(obj) {
+  return JSON.parse(JSON.stringify(obj, (k,v) => v === undefined ? null : v));
+}
+
+// ── loadDB: try Firestore first, fallback to IDB cache ──
+async function loadDB() {
+  // Always try local cache first for instant load
+  try {
+    const cached = await idbGet('data', 'main');
+    if (cached) {
+      db = cached;
+      db.pdcs    = (db.pdcs||[]).map(p => ({...p, checkImages: p.checkImages||[]}));
+      db.tenants = (db.tenants||[]).map(t => ({...t, contractDocs: t.contractDocs||[]}));
+    }
+  } catch(e) {}
+
+  if (!_firebaseReady) {
+    if (!db.tenants || !db.tenants.length) {
+      db = { tenants: JSON.parse(JSON.stringify(SEED_TENANTS)), pdcs: JSON.parse(JSON.stringify(SEED_PDCS)) };
+      saveLocalCache();
+    }
+    return;
+  }
+
+  // Fetch from Firestore
+  try {
+    setCloudStatus('syncing','☁ Loading…');
+    const [tSnap, pSnap] = await Promise.all([
+      _fsdb.collection('tenants').get(),
+      _fsdb.collection('pdcs').get()
+    ]);
+    const cloudTenants = tSnap.docs.map(d => ({...d.data(), id: d.id}));
+    const cloudPdcs    = pSnap.docs.map(d => ({...d.data(), id: d.id}));
+
+    if (cloudTenants.length > 0) {
+      db.tenants = cloudTenants.map(t => ({...t, contractDocs: t.contractDocs||[]}));
+      db.pdcs    = cloudPdcs.map(p => ({...p, checkImages: p.checkImages||[]}));
+    } else {
+      // First-time: seed to Firestore
+      db = { tenants: JSON.parse(JSON.stringify(SEED_TENANTS)), pdcs: JSON.parse(JSON.stringify(SEED_PDCS)) };
+      await saveDB();
+    }
+    saveLocalCache();
+    setCloudStatus('online','☁ Cloud synced');
+  } catch(e) {
+    console.warn('Firestore load failed, using cache:', e);
+    setCloudStatus('offline','☁ Offline mode');
+    if (!db.tenants || !db.tenants.length) {
+      db = { tenants: JSON.parse(JSON.stringify(SEED_TENANTS)), pdcs: JSON.parse(JSON.stringify(SEED_PDCS)) };
+    }
+  }
+}
+
+// ── IDB local cache (offline fallback) ─────────────────
+const IDB_NAME    = 'PrimeAxisDB';
+const IDB_VERSION = 2;
+let _idb = null;
+
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    if (_idb) { resolve(_idb); return; }
+    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+    req.onupgradeneeded = e => {
+      const idb = e.target.result;
+      if (!idb.objectStoreNames.contains('data'))  idb.createObjectStore('data');
+      if (!idb.objectStoreNames.contains('files')) idb.createObjectStore('files');
+    };
+    req.onsuccess = e => { _idb = e.target.result; resolve(_idb); };
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+function idbGet(store, key) {
+  return openIDB().then(idb => new Promise((res, rej) => {
+    const req = idb.transaction(store,'readonly').objectStore(store).get(key);
+    req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error);
+  }));
+}
+function idbPut(store, key, value) {
+  return openIDB().then(idb => new Promise((res, rej) => {
+    const req = idb.transaction(store,'readwrite').objectStore(store).put(value, key);
+    req.onsuccess = () => res(); req.onerror = () => rej(req.error);
+  }));
+}
+function idbDelete(store, key) {
+  return openIDB().then(idb => new Promise((res, rej) => {
+    const req = idb.transaction(store,'readwrite').objectStore(store).delete(key);
+    req.onsuccess = () => res(); req.onerror = () => rej(req.error);
+  }));
+}
+function saveLocalCache() {
+  idbPut('data', 'main', JSON.parse(JSON.stringify(db))).catch(()=>{});
+}
+
+// ── File storage: Firebase Storage + IDB fallback ──────
+async function saveFile(fileId, blob) {
+  // Always cache locally first
+  await idbPut('files', fileId, blob).catch(()=>{});
+  // Upload to Firebase Storage if available
+  if (_firebaseReady) {
+    try {
+      const ref = _fstore.ref('files/' + fileId);
+      await ref.put(blob);
+    } catch(e) {
+      console.warn('Firebase Storage upload failed, kept in IDB:', e);
+    }
+  }
+}
+
+async function getFileURL(fileId) {
+  // Try Firebase Storage first if online
+  if (_firebaseReady && navigator.onLine) {
+    try {
+      const url = await _fstore.ref('files/' + fileId).getDownloadURL();
+      return url;
+    } catch(e) {
+      // Fall through to local cache
+    }
+  }
+  // Local IDB fallback
+  const blob = await idbGet('files', fileId).catch(()=>null);
+  if (blob) return URL.createObjectURL(blob);
+  return null;
+}
+
+async function deleteFile(fileId) {
+  idbDelete('files', fileId).catch(()=>{});
+  if (_firebaseReady) {
+    try { await _fstore.ref('files/' + fileId).delete(); } catch(e){}
+  }
+}
+
+function makeFileId(prefix) {
+  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+}
+
+// ── Firestore delete helpers (for deleteDoc) ────────────
+async function firestoreDelete(collection, id) {
+  if (!_firebaseReady) return;
+  try { await _fsdb.collection(collection).doc(String(id)).delete(); } catch(e){}
+}
+
+// ── Auth ───────────────────────────────────────────────
+function doLogin() {
+  const u = document.getElementById('inp-user').value.trim().toLowerCase();
+  const p = document.getElementById('inp-pass').value;
+  const err = document.getElementById('login-err');
+  if (!USERS[u] || USERS[u].password !== p) {
+    err.style.display = 'block';
+    err.textContent = 'Invalid username or password. Please try again.';
+    document.getElementById('inp-pass').value = '';
+    return;
+  }
+  err.style.display = 'none';
+  currentUser = { username: u, ...USERS[u] };
+  sessionStorage.setItem('pa_session', JSON.stringify(currentUser));
+  startApp(); // async — IDB loads before render
+}
+function doLogout() {
+  sessionStorage.removeItem('pa_session');
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pass').value = '';
+}
+function checkSession() {
+  try {
+    const s = sessionStorage.getItem('pa_session');
+    if (s) { currentUser = JSON.parse(s); return true; }
+  } catch(e){}
+  return false;
+}
+function isAdmin() { return currentUser && currentUser.role === 'admin'; }
+
+// ── App Start ──────────────────────────────────────────
+async function startApp() {
+  // Init Firebase first so saveDB/loadDB work correctly
+  await initFirebase();
+  await loadDB();
+  loadUsers();
+  // Request persistent storage
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(()=>{});
+  }
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('hdr-user').textContent = currentUser.label + ' (' + currentUser.username + ')';
+
+  const admin = isAdmin();
+
+  // Header buttons
+  document.getElementById('hdr-admin-btns').style.display = admin ? 'flex' : 'none';
+  document.getElementById('hdr-staff-btn').style.display  = admin ? 'none' : 'flex';
+
+  // Tabs — staff sees Tenants + PDC; Settings is admin-only
+  const tabPdcs     = document.getElementById('tab-pdcs');
+  const tabSettings = document.getElementById('tab-settings');
+  if (tabPdcs)     tabPdcs.style.display     = 'block'; // both roles
+  if (tabSettings) tabSettings.style.display = admin ? 'block' : 'none';
+
+  // Bottom nav — staff sees Tenants + Checks; Settings is admin-only
+  const bn1 = document.getElementById('bnav-1');
+  const bn2 = document.getElementById('bnav-2');
+  if (bn1) bn1.style.display = 'flex'; // both roles
+  if (bn2) bn2.style.display = admin ? 'flex' : 'none';
+
+  // Staff always lands on Tenants tab
+  activeTab = 0;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('on',i===0));
+  document.querySelectorAll('.bnav-btn').forEach((b,i)=>b.classList.toggle('on',i===0));
+
+  renderTab();
+}
+
+// ── Helpers ────────────────────────────────────────────
+function peso(n) { return '₱' + Number(n).toLocaleString(); }
+function today() {
+  // Always returns today's real local date as YYYY-MM-DD
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function daysUntilDue(dueDate, lastPaid) {
+  if (!lastPaid) return -999;    //if new client, no lastPaid entry
+  // Find the NEXT due date on or after today, rolling month by month.
+  // Example: dueDate=1, lastPaid=2025-04-01, today=2025-05-22
+  //   → next = 2025-05-01 → still past → roll to 2025-06-01 → +10 days
+  const now  = new Date(TODAY);
+  const paid = new Date(lastPaid);
+  // Start from 1 month after lastPaid on the dueDate day
+  const next = new Date(paid.getFullYear(), paid.getMonth() + 1, dueDate);
+  // Roll forward until it is today or in the future
+  while (next < now) {
+    next.setMonth(next.getMonth() + 1);
+  }
+  return Math.ceil((next - now) / 86400000);
+}
+function pdcBadge(checkDate, status) {
+  const diff = Math.ceil((new Date(checkDate) - TODAY) / 86400000);
+  if (status==='deposited') return {l:'Deposited',             c:var_green,  bg:var_green_l, i:'✓'};
+  if (status==='bounced')   return {l:'Bounced',               c:var_red,    bg:var_red_l,   i:'✕'};
+  if (status==='cancelled') return {l:'Cancelled',             c:'#6b7280',  bg:'#f3f4f6',   i:'—'};
+  if (diff < 0)             return {l:Math.abs(diff)+'d over', c:var_red,    bg:var_red_l,   i:'⚠'};
+  if (diff===0)             return {l:'Due TODAY',             c:var_yellow, bg:var_yellow_l,i:'🔔'};
+  if (diff<=7)              return {l:'In '+diff+'d',          c:var_yellow, bg:var_yellow_l,i:'⏰'};
+  return                          {l:'In '+diff+'d',           c:var_purple, bg:var_purple_l,i:'📅'};
+}
+const var_green='#0e9f6e', var_green_l='#ecfdf5';
+const var_red='#dc2626',   var_red_l='#fef2f2';
+const var_yellow='#d97706',var_yellow_l='#fffbeb';
+const var_purple='#7c3aed',var_purple_l='#f5f3ff';
+const var_accent='#1d4ed8',var_accent_l='#eff4ff';
+
+const RENT_CFG = {
+  deposited:    {l:'Deposited',    c:var_green,  bg:var_green_l,  i:'✓'},
+  pending:      {l:'Pending',      c:var_yellow, bg:var_yellow_l, i:'⏳'},
+  not_received: {l:'Not Received', c:var_red,    bg:var_red_l,    i:'✕'},
+};
+
+function chip(text, color, bg) { return `<span class="chip" style="color:${color};background:${bg}">${text}</span>`; }
+function nextId(arr) { return arr.length ? Math.max(...arr.map(x=>x.id))+1 : 1; }
+
+function toast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = err ? var_red : var_accent;
+  t.style.display = 'block';
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.style.display='none', 2800);
+}
+function closeModal(id) { document.getElementById(id).style.display='none'; }
+function openModal(id)  { document.getElementById(id).style.display='flex'; }
+function openImgViewer(src, label) {
+  document.getElementById('img-viewer-img').src = src;
+  document.getElementById('img-viewer-label').textContent = label || '';
+  document.getElementById('img-viewer').style.display = 'flex';
+}
+function closeImgViewer() {
+  const viewer = document.getElementById('img-viewer');
+  viewer.style.display = 'none';
+  if (viewer._revokeUrl) { URL.revokeObjectURL(viewer._revokeUrl); viewer._revokeUrl = null; }
+  document.getElementById('img-viewer-img').src = '';
+}
+
+function stats() {
+  const T=db.tenants, P=db.pdcs;
+  const overdue   = T.filter(t=>daysUntilDue(t.dueDate,t.lastPaid)<0).length;
+  const dueSoon   = T.filter(t=>{const d=daysUntilDue(t.dueDate,t.lastPaid);return d>=0&&d<=5;}).length;
+  const deposited = T.filter(t=>t.checkStatus==='deposited').length;
+  const totalRent = T.reduce((s,t)=>s+t.rent,0);
+  const collectedRent = T.filter(t=>t.checkStatus==='deposited').reduce((s,t)=>s+t.rent,0);
+  const holding   = P.filter(p=>p.status==='holding');
+  const pdcReady  = holding.filter(p=>new Date(p.checkDate)<=TODAY).length;
+  const pdcSoon   = holding.filter(p=>{const d=Math.ceil((new Date(p.checkDate)-TODAY)/86400000);return d>0&&d<=7;}).length;
+  const pdcBounced= P.filter(p=>p.status==='bounced').length;
+  const pdcHeldAmt= holding.reduce((s,p)=>s+p.amount,0);
+  const withImage = P.filter(p=>(p.checkImages||[]).length > 0).length;
+  const missingImages = holding.filter(p=>!(p.checkImages||[]).length).length;
+  return {overdue,dueSoon,deposited,totalRent,collectedRent,pdcHeld:holding.length,pdcReady,pdcSoon,pdcBounced,pdcHeldAmt,withImage,missingImages,total:T.length,pdcTotal:P.length};
+}
+
+// ── Tab Routing ────────────────────────────────────────
+function switchTab(i) {
+  // Staff cannot access Settings tab (tab 2)
+  if (!isAdmin() && i === 2) {
+    toast('Settings is restricted to administrators.', true);
+    return;
+  }
+  activeTab = i;
+  document.querySelectorAll('.tab-btn').forEach((b,idx)=>b.classList.toggle('on',idx===i));
+  document.querySelectorAll('.bnav-btn').forEach((b,idx)=>b.classList.toggle('on',idx===i));
+  if (i===2) { renderSettings(); return; }
+  renderTab();
+}
+function renderTab() {
+  if (activeTab===0) renderTenants();
+  else if (activeTab===1) renderPDCs();
+}
+
+// ══════════════════════════════════════════════════════
+//  TENANTS TAB
+// ══════════════════════════════════════════════════════
+function renderTenants() {
+  const S = stats();
+  let tenants = db.tenants;
+  if (tenantFilter==='overdue')       tenants=tenants.filter(t=>daysUntilDue(t.dueDate,t.lastPaid)<0);
+  else if(tenantFilter==='due_soon')  tenants=tenants.filter(t=>{const d=daysUntilDue(t.dueDate,t.lastPaid);return d>=0&&d<=5;});
+  else if(tenantFilter==='not_received') tenants=tenants.filter(t=>t.checkStatus==='not_received');
+  else if(tenantFilter==='pending')   tenants=tenants.filter(t=>t.checkStatus==='pending');
+
+  const filters = [
+    {k:'all',l:`All (${db.tenants.length})`},{k:'overdue',l:`Overdue (${S.overdue})`},
+    {k:'due_soon',l:`Due Soon (${S.dueSoon})`},{k:'not_received',l:'Not Received'},{k:'pending',l:'Pending'}
+  ];
+
+  let html = `
+  <div class="stat-grid">
+    ${statCard('Total Units',    db.tenants.length,    S.overdue+' overdue',          S.overdue>0?var_red:var_accent)}
+    ${statCard('Deposited',      S.deposited,          'of '+db.tenants.length+' tenants', var_green)}
+    ${statCard('Rent Collected', peso(S.collectedRent),'of '+peso(S.totalRent),        var_accent, true, (S.collectedRent/S.totalRent*100))}
+    ${statCard('Due Soon',       S.dueSoon,            'within 5 days',                var_yellow)}
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+    ${S.overdue>0?`<div class="alert" style="background:var(--red-light);border:1.5px solid #fca5a5;color:var(--red)">⚠ ${S.overdue} tenant${S.overdue>1?'s':''} overdue on rent</div>`:''}
+    ${S.pdcReady>0?`<div class="alert" style="background:var(--accent-light);border:1.5px solid #bfcfef;color:var(--accent);cursor:pointer" onclick="switchTab(1);pdcFilter='ready';renderTab()">🔔 ${S.pdcReady} PDC${S.pdcReady>1?'s':''} ready to deposit — tap to view →</div>`:''}
+    ${S.pdcBounced>0?`<div class="alert" style="background:var(--red-light);border:1.5px solid #fca5a5;color:var(--red)">✕ ${S.pdcBounced} bounced check${S.pdcBounced>1?'s':''} — follow up needed</div>`:''}
+    ${S.missingImages>0?`<div class="alert" style="background:var(--yellow-light);border:1.5px solid #fcd34d;color:var(--yellow);cursor:pointer" onclick="switchTab(1);pdcFilter='no_image';renderTab()">📷 ${S.missingImages} check${S.missingImages>1?'s':''} missing images →</div>`:''}
+  </div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+    <span style="font-size:12px;color:var(--muted);font-weight:600">Filter:</span>
+    ${filters.map(f=>`<button class="fb ${tenantFilter===f.k?'on':''}" onclick="tenantFilter='${f.k}';renderTenants()">${f.l}</button>`).join('')}
+  </div>
+  <div class="card" style="overflow:hidden">
+    <div class="row-hdr" style="grid-template-columns:58px 1fr 100px 120px 130px">
+      <div>Unit</div><div>Tenant</div><div class="hide-xs">Rent</div><div>Due Status</div><div>Check Status</div>
+    </div>`;
+
+  if (!tenants.length) {
+    html += `<div style="padding:40px;text-align:center;color:var(--muted);font-size:14px">No tenants match this filter.</div>`;
+  } else {
+    tenants.forEach(t => {
+      const dl = daysUntilDue(t.dueDate, t.lastPaid);
+      const ov=dl<0, ds=!ov&&dl<=5;
+      const sc = RENT_CFG[t.checkStatus];
+      const heldCount = db.pdcs.filter(p=>p.tenantId===t.id&&p.status==='holding').length;
+      const imgCount  = db.pdcs.filter(p=>p.tenantId===t.id&&(p.checkImages||[]).length>0).length;
+      const dueChip = ov
+        ? chip('⚠ '+Math.abs(dl)+'d over', var_red,    var_red_l)
+        : ds ? chip('⏰ '+dl+'d left', var_yellow, var_yellow_l)
+             : chip('✓ '+dl+'d away',  var_green,  var_green_l);
+      html += `
+      <div class="data-row" style="grid-template-columns:58px 1fr 100px 120px 130px" onclick="openTenantDetail(${t.id})">
+        <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;color:var(--accent)">${t.unit}</div>
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--text)">${t.name}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;font-weight:500">
+            Due ${t.dueDate===1?'1st':t.dueDate+'th'} of month
+            ${heldCount>0?`<span style="color:var(--purple);margin-left:8px">📁 ${heldCount} PDC${heldCount!==1?'s':''}</span>`:''}
+            ${imgCount>0?`<span style="color:var(--green);margin-left:4px">📷${imgCount}</span>`:''}
+            ${(t.contractDocs&&t.contractDocs.length)?`<span style="color:var(--accent);margin-left:4px">📄${t.contractDocs.length}</span>`:''}
+          </div>
+        </div>
+        <div class="hide-xs" style="font-size:14px;color:var(--sub);font-weight:500">${peso(t.rent)}</div>
+        <div>${dueChip}</div>
+        <div>${chip(sc.i+' '+sc.l, sc.c, sc.bg)}</div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+  document.getElementById('content').innerHTML = html;
+}
+
+// ── Staff view: add tenant only ───────────────────────
+function renderTenantsStaff() {
+  const tenants = db.tenants;
+  let html = `
+  <div style="background:var(--accent-light);border:1.5px solid #bfcfef;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+    <span style="font-size:22px">👤</span>
+    <div>
+      <div style="font-weight:700;font-size:15px;color:var(--accent)">Staff Access</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:2px">You can add new tenants. Contact your administrator for full access.</div>
+    </div>
+    <button class="btn btn-primary btn-sm" style="margin-left:auto;flex-shrink:0" onclick="showAddTenant()">+ Add Tenant</button>
+  </div>
+  <div class="card" style="overflow:hidden">
+    <div class="row-hdr" style="grid-template-columns:58px 1fr 110px 130px">
+      <div>Unit</div><div>Tenant</div><div>Contract</div><div>Check Status</div>
+    </div>`;
+  if (!tenants.length) {
+    html += `<div style="padding:40px;text-align:center;color:var(--muted);font-size:14px">No tenants on record yet.</div>`;
+  } else {
+    tenants.forEach(t => {
+      const sc = RENT_CFG[t.checkStatus];
+      const contractCount = (t.contractDocs||[]).length;
+      html += `
+      <div class="data-row" style="grid-template-columns:58px 1fr 110px 130px;cursor:default" onclick="openTenantDetail(${t.id})">
+        <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;color:var(--accent)">${t.unit}</div>
+        <div>
+          <div style="font-size:15px;font-weight:600">${t.name}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${t.leaseStart||'—'} → ${t.leaseEnd||'—'}</div>
+        </div>
+        <div>
+          ${contractCount
+            ? `<span class="chip" style="color:var(--accent);background:var(--accent-light)">📄 ${contractCount} file${contractCount!==1?'s':''}</span>`
+            : `<span style="font-size:12px;color:var(--muted)">No files</span>`}
+        </div>
+        <div>${chip(sc.i+' '+sc.l, sc.c, sc.bg)}</div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+  document.getElementById('content').innerHTML = html;
+}
+
+function statCard(label, val, sub, color, bar=false, pct=0) {
+  return `<div class="card stat-card">
+    <div class="stat-label">${label}</div>
+    <div class="stat-val" style="color:${color}">${val}</div>
+    <div class="stat-sub">${sub}</div>
+    ${bar?`<div class="pb"><div class="pf" style="width:${pct}%"></div></div>`:''}
+  </div>`;
+}
+
+// ── Tenant Detail Modal ────────────────────────────────
+function openTenantDetail(id) {
+  const t = db.tenants.find(x=>x.id===id);
+  if (!t) return;
+  const tPdcs = db.pdcs.filter(p=>p.tenantId===id);
+
+  let pdcHtml = '';
+  if (!tPdcs.length) {
+    pdcHtml = `<div style="background:var(--surface2);border-radius:10px;padding:18px;text-align:center;font-size:14px;color:var(--muted);border:1.5px solid var(--border2)">No post-dated checks on file for this tenant.</div>`;
+  } else {
+    tPdcs.forEach(pdc => {
+      const b = pdcBadge(pdc.checkDate, pdc.status);
+      const imgs = pdc.checkImages || [];
+      pdcHtml += `
+      <div style="background:var(--surface2);border-radius:12px;padding:16px;border:1.5px solid var(--border2);margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <span style="color:var(--accent);font-weight:700;font-size:16px">#${pdc.checkNo}</span>
+              <span style="font-size:15px;font-weight:600">${peso(pdc.amount)}</span>
+              ${chip(b.i+' '+b.l, b.c, b.bg)}
+              ${imgs.length?`<span style="font-size:12px;color:var(--green);font-weight:600">📷 ${imgs.length} image${imgs.length>1?'s':''}</span>`:''}
+            </div>
+            <div style="font-size:13px;color:var(--muted);margin-top:5px;font-weight:500">${pdc.checkDate} · ${pdc.bank}${pdc.memo?' · '+pdc.memo:''}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${pdc.status==='holding'?`<button class="btn btn-success btn-sm" onclick="markPdc(${pdc.id},'deposited');openTenantDetail(${t.id})">✓ Deposit</button>`:''}
+            <button class="btn btn-ghost btn-sm" onclick="openPdcDetail(${pdc.id})">🔍 Details</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="sl" style="margin-bottom:0">Check Images (${imgs.length})</div>
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer;font-size:12px">+ Add
+            <input type="file" accept="image/*,application/pdf" multiple capture="environment" style="display:none" onchange="uploadPdcImage(${pdc.id},this);setTimeout(()=>openTenantDetail(${t.id}),600)"/>
+          </label>
+        </div>
+        ${imgs.length
+          ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px">
+              ${imgs.map(img=>`
+              <div style="border-radius:8px;overflow:hidden;border:1.5px solid var(--border2);cursor:pointer;background:var(--surface);position:relative" onclick="viewCheckImage('${img.id}','Check #${pdc.checkNo} — ${img.name}')">
+                <div style="height:65px;display:flex;align-items:center;justify-content:center;font-size:22px">${img.type==='img'?'🖼':'📄'}</div>
+                <div style="padding:3px 5px;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.name}</div>
+              </div>`).join('')}
+             </div>`
+          : `<label class="upload-area" style="display:block;padding:18px">
+               <div style="font-size:24px;margin-bottom:6px">📷</div>
+               <div style="color:var(--sub);font-size:13px;font-weight:600">Upload check images</div>
+               <div style="color:var(--muted);font-size:11px;margin-top:2px">Multiple files · Camera · PDF</div>
+               <input type="file" accept="image/*,application/pdf" multiple capture="environment" style="display:none" onchange="uploadPdcImage(${pdc.id},this);setTimeout(()=>openTenantDetail(${t.id}),600)"/>
+             </label>`
+        }
+      </div>`;
+    });
+  }
+
+  const sc = RENT_CFG[t.checkStatus];
+  const body = `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px">
+    <div>
+      <div style="font-family:'Manrope',sans-serif;font-size:21px;font-weight:800;color:var(--text)">${t.name}</div>
+      <div style="color:var(--accent);font-weight:700;margin-top:3px;font-size:15px">Unit ${t.unit}</div>
+      ${(t.leaseStart && t.leaseEnd) ? `<div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:500">📅 Contract: ${t.leaseStart} → ${t.leaseEnd} &nbsp;·&nbsp; <span style="color:var(--sub);font-weight:600">${Math.round((new Date(t.leaseEnd)-new Date(t.leaseStart))/(1000*60*60*24*30))} months</span></div>` : ''}
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-tenant-detail')">✕ Close</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+    ${[['Monthly Rent',peso(t.rent)],['Due Date',(t.dueDate===1?'1st':t.dueDate+'th')+' of month'],['Contract Start',t.leaseStart||'—'],['Contract End',t.leaseEnd||'—'],['Last Paid',t.lastPaid],['Phone',t.phone],['Email',t.email]].map(([k,v])=>`
+    <div style="background:var(--surface2);border-radius:10px;padding:11px 14px;border:1px solid var(--border2)">
+      <div class="sl">${k}</div><div style="font-size:14px;font-weight:500;color:var(--text)">${v}</div>
+    </div>`).join('')}
+  </div>
+  <div class="divider"></div>
+  <div style="margin-bottom:20px">
+    <div class="sl" style="margin-bottom:10px">Monthly Check Status</div>
+    <div style="display:flex;gap:8px">
+      ${Object.entries(RENT_CFG).map(([key,cfg])=>`
+      <button class="btn btn-sm" style="flex:1;justify-content:center;font-size:13px;background:${t.checkStatus===key?cfg.c:'var(--surface)'};color:${t.checkStatus===key?'#fff':cfg.c};border:2px solid ${cfg.c}"
+        onclick="markRent(${t.id},'${key}');openTenantDetail(${t.id})">${cfg.i} ${cfg.l}</button>`).join('')}
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div style="margin-bottom:20px">
+    <div class="sl" style="margin-bottom:12px">Post-Dated Checks (${tPdcs.length})</div>
+    ${pdcHtml}
+  </div>
+  <div class="divider"></div>
+  <div style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="sl" style="margin-bottom:0">Contract Documents (${(t.contractDocs||[]).length})</div>
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer">📎 Upload File
+        <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp" multiple style="display:none" onchange="uploadContract(${t.id},this)"/>
+      </label>
+    </div>
+    ${!(t.contractDocs&&t.contractDocs.length)
+      ? `<label class="upload-area" style="display:block;text-align:center;cursor:pointer">
+             <div style="font-size:28px;margin-bottom:8px">📄</div>
+             <div style="color:var(--sub);font-size:14px;font-weight:600">Tap to upload contract</div>
+             <div style="color:var(--muted);font-size:12px;margin-top:4px">PDF, Word, or image files accepted</div>
+             <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp" multiple style="display:none" onchange="uploadContract(${t.id},this)"/>
+           </label>`
+      : (t.contractDocs||[]).map((doc,i)=>`
+         <div class="doc-item">
+           <div class="doc-icon ${doc.type==='pdf'?'pdf':doc.type==='img'?'img':'other'}">${doc.type==='pdf'?'📄':doc.type==='img'?'🖼':'📎'}</div>
+           <div style="flex:1;min-width:0">
+             <div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${doc.name}</div>
+             <div style="font-size:11px;color:var(--muted);margin-top:1px">${doc.size} · Uploaded ${doc.uploaded}</div>
+           </div>
+           <div style="display:flex;gap:6px;flex-shrink:0">
+             <button class="btn btn-ghost btn-sm" onclick="viewContract(${t.id},${i})">👁 View</button>
+             <button class="btn btn-danger btn-sm" onclick="deleteContract(${t.id},${i})">🗑</button>
+           </div>
+         </div>`).join('')
+    }
+  </div>
+  <div style="display:flex;justify-content:space-between;gap:10px;padding-top:4px">
+    ${isAdmin()?`<button class="btn btn-danger btn-sm" onclick="deleteTenant(${t.id})">🗑 Remove Tenant</button>`:'<div></div>'}
+    <button class="btn btn-primary btn-sm" onclick="closeModal('modal-tenant-detail');showAddPdc(${t.id})">+ Add PDC for this Tenant</button>
+  </div>`;
+
+  document.getElementById('modal-tenant-detail-body').innerHTML = body;
+  openModal('modal-tenant-detail');
+}
+
+function markRent(id, status) {
+  const t = db.tenants.find(x=>x.id===id);
+  if (!t) return;
+  t.checkStatus = status;
+  if (status==='deposited') t.lastPaid = today();
+  saveDB(); renderTab(); toast('Rent status updated!');
+}
+
+function deleteTenant(id) {
+  if (!isAdmin()) { toast('Only administrators can delete tenants.', true); return; }
+  if (!confirm('Remove this tenant? This cannot be undone.')) return;
+  const removedPdcs = db.pdcs.filter(p=>p.tenantId===id);
+  db.tenants = db.tenants.filter(t=>t.id!==id);
+  db.pdcs    = db.pdcs.filter(p=>p.tenantId!==id);
+  firestoreDelete('tenants', id);
+  removedPdcs.forEach(p => firestoreDelete('pdcs', p.id));
+  saveDB(); closeModal('modal-tenant-detail'); renderTab(); toast('Tenant removed.');
+}
+
+function showAddTenant() {
+  document.getElementById('modal-add-tenant-body').innerHTML = `
+  <div style="font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;margin-bottom:20px;color:var(--text)">Add New Tenant</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+    <div style="grid-column:span 2"><div class="sl">Full Name</div><input id="at-name" placeholder="Juan dela Cruz"/></div>
+    <div><div class="sl">Unit Number</div><input id="at-unit" placeholder="e.g. 4B"/></div>
+    <div><div class="sl">Monthly Rent (₱)</div><input id="at-rent" type="number" placeholder="18000"/></div>
+    <div><div class="sl">Due Day (1–28)</div><input id="at-due" type="number" value="1" min="1" max="28"/></div>
+    <div><div class="sl">Phone Number</div><input id="at-phone" placeholder="0917-000-0000"/></div>
+    <div style="grid-column:span 2"><div class="sl">Email Address</div><input id="at-email" type="email" placeholder="email@example.com"/></div>
+    <div><div class="sl">Contract Start Date</div><input id="at-start" type="date"/></div>
+    <div><div class="sl">Contract End Date</div><input id="at-lease" type="date"/></div>
+  </div>
+  <div style="display:flex;gap:10px;justify-content:flex-end">
+    <button class="btn btn-ghost" onclick="closeModal('modal-add-tenant')">Cancel</button>
+    <button class="btn btn-primary" onclick="doAddTenant()">Add Tenant</button>
+  </div>`;
+  openModal('modal-add-tenant');
+}
+function doAddTenant() {
+  const name=v('at-name'),unit=v('at-unit'),rent=+v('at-rent'),due=+v('at-due');
+  if(!name||!unit||!rent){toast('Name, unit and rent are required.',true);return;}
+    const ls = v('at-start');
+  const initLastPaid = ls || today().slice(0,7)+'-01';
+  db.tenants.push({id:nextId(db.tenants),name,unit,rent,dueDate:due||1,lastPaid:initLastPaid,checkStatus:'not_received',phone:v('at-phone'),email:v('at-email'),leaseStart:ls,leaseEnd:v('at-lease'),contractDocs:[]});
+  saveDB(); closeModal('modal-add-tenant'); renderTab(); toast('Tenant added!');
+}
+function v(id){return document.getElementById(id)?.value?.trim()||'';}
+
+// ══════════════════════════════════════════════════════
+//  PDC TAB
+// ══════════════════════════════════════════════════════
+function renderPDCs() {
+  const S = stats();
+  let pdcs = [...db.pdcs];
+  if (pdcFilter==='ready')      pdcs=pdcs.filter(p=>p.status==='holding'&&new Date(p.checkDate)<=TODAY);
+  else if(pdcFilter==='soon')   pdcs=pdcs.filter(p=>{const d=Math.ceil((new Date(p.checkDate)-TODAY)/86400000);return p.status==='holding'&&d>0&&d<=7;});
+  else if(pdcFilter==='holding')pdcs=pdcs.filter(p=>p.status==='holding'&&new Date(p.checkDate)>TODAY);
+  else if(pdcFilter==='deposited') pdcs=pdcs.filter(p=>p.status==='deposited');
+  else if(pdcFilter==='bounced')   pdcs=pdcs.filter(p=>p.status==='bounced');
+  else if(pdcFilter==='no_image')  pdcs=pdcs.filter((p=>!p.checkImages || p.checkImages.length === 0)&&p.status==='holding');
+  if(pdcSort==='date')   pdcs.sort((a,b)=>new Date(a.checkDate)-new Date(b.checkDate));
+  if(pdcSort==='amount') pdcs.sort((a,b)=>b.amount-a.amount);
+  if(pdcSort==='tenant') pdcs.sort((a,b)=>a.tenantName.localeCompare(b.tenantName));
+
+  const filters=[
+    {k:'all',l:`All (${db.pdcs.length})`},{k:'ready',l:`Ready (${S.pdcReady})`},{k:'soon',l:`Soon (${S.pdcSoon})`},
+    {k:'holding',l:'Holding'},{k:'deposited',l:'Deposited'},{k:'bounced',l:'Bounced'},{k:'no_image',l:`No Image (${S.missingImages})`}
+  ];
+  const sorts=[{k:'date',l:'Date'},{k:'tenant',l:'Tenant'},{k:'amount',l:'Amount'}];
+
+  let html = `
+  <div class="stat-grid">
+    ${statCard('Checks Held',      S.pdcHeld,                 'currently holding',  var_purple)}
+    ${statCard('Ready to Deposit', S.pdcReady,                'date has been reached', var_accent)}
+    ${statCard('Images Uploaded',  S.withImage+' / '+S.pdcTotal,'of all checks',    var_green)}
+    ${statCard('Total Held Value', peso(S.pdcHeldAmt),        'across all tenants', var_yellow)}
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+    ${S.pdcReady>0?`<div class="alert" style="background:var(--accent-light);border:1.5px solid #bfcfef;color:var(--accent)">🔔 ${S.pdcReady} check${S.pdcReady>1?'s are':' is'} ready to deposit now.</div>`:''}
+    ${S.missingImages>0?`<div class="alert" style="background:var(--yellow-light);border:1.5px solid #fcd34d;color:var(--yellow)">📷 ${S.missingImages} check${S.missingImages>1?'s are':' is'} still missing an image.</div>`:''}
+    ${S.pdcBounced>0?`<div class="alert" style="background:var(--red-light);border:1.5px solid #fca5a5;color:var(--red)">✕ ${S.pdcBounced} bounced check${S.pdcBounced>1?'s':''} need follow-up.</div>`:''}
+  </div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:12px;color:var(--muted);font-weight:600">Filter:</span>
+      ${filters.map(f=>`<button class="fb ${pdcFilter===f.k?'on':''}" onclick="pdcFilter='${f.k}';renderPDCs()">${f.l}</button>`).join('')}
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+      <span style="font-size:12px;color:var(--muted);font-weight:600">Sort:</span>
+      ${sorts.map(s=>`<button class="fb ${pdcSort===s.k?'on':''}" onclick="pdcSort='${s.k}';renderPDCs()">${s.l}</button>`).join('')}
+    </div>
+  </div>
+  <div class="card" style="overflow:hidden;margin-bottom:26px">
+    <div class="row-hdr hide-xs" style="grid-template-columns:90px 160px 90px 110px 110px 120px 90px 1fr">
+      <div>Check #</div><div>Tenant</div><div>Amount</div><div>Check Date</div><div>Received</div><div>Status</div><div>Image</div><div>Actions</div>
+    </div>`;
+
+  if (!pdcs.length) {
+    html += `<div style="padding:40px;text-align:center;color:var(--muted);font-size:14px">No checks match this filter.</div>`;
+  } else {
+    pdcs.forEach(pdc => {
+      const b = pdcBadge(pdc.checkDate, pdc.status);
+      const isReady = pdc.status==='holding'&&new Date(pdc.checkDate)<=TODAY;
+      const rowBg = isReady?var_accent_l:pdc.status==='bounced'?var_red_l:'transparent';
+      html += `
+      <div class="data-row" style="grid-template-columns:90px 160px 90px 110px 110px 120px 90px 1fr;background:${rowBg};cursor:default">
+        <div style="font-family:'Manrope',sans-serif;font-weight:800;color:var(--accent);font-size:14px;display:flex;align-items:center;gap:5px">
+          #${pdc.checkNo}${pdc.checkImage?'<span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block" title="Image on file"></span>':''}
+        </div>
+        <div>
+          <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px">${pdc.tenantName}</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:500">Unit ${pdc.unit} · ${pdc.bank}</div>
+        </div>
+        <div style="font-weight:600;font-size:14px">${peso(pdc.amount)}</div>
+        <div>
+          <div style="font-size:14px">${pdc.checkDate}</div>
+          ${pdc.memo?`<div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px">${pdc.memo}</div>`:''}
+        </div>
+        <div style="color:var(--muted);font-size:13px">${pdc.receivedDate||'—'}</div>
+        <div>${chip(b.i+' '+b.l, b.c, b.bg)}</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          ${(pdc.checkImages&&pdc.checkImages.length)
+            ? `<button class="btn btn-ghost btn-sm" onclick="openPdcImageGallery(${pdc.id})">🖼 ${pdc.checkImages.length} image${pdc.checkImages.length>1?'s':''}</button>`
+            : ''}
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer">📎 Add<input type="file" accept="image/*,application/pdf" capture="environment" multiple style="display:none" onchange="uploadPdcImage(${pdc.id},this)"/></label>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          ${pdc.status==='holding'?`
+            <button class="btn btn-success btn-sm" onclick="markPdc(${pdc.id},'deposited')">✓ Deposit</button>
+            <button class="btn btn-danger btn-sm" onclick="markPdc(${pdc.id},'bounced')">✕</button>
+            <button class="btn btn-ghost btn-sm" onclick="openPdcDetail(${pdc.id})">🔍</button>
+          `:''}
+          ${pdc.status==='deposited'?`<span style="font-size:12px;color:var(--green);font-weight:600">✓ ${pdc.depositedDate}</span><button class="btn btn-ghost btn-sm" onclick="openPdcDetail(${pdc.id})">🔍</button>`:''}
+          ${pdc.status==='bounced'?`<button class="btn btn-ghost btn-sm" onclick="markPdc(${pdc.id},'holding')">↩ Revert</button><button class="btn btn-ghost btn-sm" onclick="openPdcDetail(${pdc.id})">🔍</button>`:''}
+        </div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  // Summary by tenant
+  html += `<div style="font-size:14px;color:var(--sub);font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.04em">Summary by Tenant</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">`;
+  db.tenants.forEach(t => {
+    const tp=db.pdcs.filter(p=>p.tenantId===t.id); if(!tp.length) return;
+    const held=tp.filter(p=>p.status==='holding'),dep=tp.filter(p=>p.status==='deposited'),boun=tp.filter(p=>p.status==='bounced');
+    const withImg=tp.filter(p=>(p.checkImages||[]).length>0).length;
+    const nextP=[...held].sort((a,b)=>new Date(a.checkDate)-new Date(b.checkDate))[0];
+    const totalHeld=held.reduce((s,p)=>s+p.amount,0);
+    html += `
+    <div class="card" style="padding:16px 18px;cursor:pointer" onclick="openTenantDetail(${t.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-weight:700;font-size:15px;color:var(--text)">${t.name}</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:500">Unit ${t.unit}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;color:var(--accent)">${tp.length}</div>
+          <div style="font-size:11px;font-weight:600;color:${withImg===tp.length?var_green:var_yellow}">${withImg}/${tp.length} 📷</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        ${held.length?chip('📁 '+held.length+' held',    var_purple, var_purple_l):''}
+        ${dep.length? chip('✓ '+dep.length+' dep.',     var_green,  var_green_l): ''}
+        ${boun.length?chip('✕ '+boun.length+' bounced', var_red,    var_red_l):  ''}
+      </div>
+      ${nextP?`<div style="background:var(--surface2);border-radius:8px;padding:8px 12px;font-size:13px;border:1px solid var(--border2)">
+        <span style="color:var(--muted);font-weight:500">Next: </span>
+        <span style="color:var(--accent);font-weight:700">#${nextP.checkNo}</span>
+        <span style="color:var(--muted)"> · </span>
+        <span style="font-weight:600">${nextP.checkDate}</span>
+      </div>`:''}
+      ${totalHeld?`<div style="font-size:13px;color:var(--muted);margin-top:8px;font-weight:500">Holding: <span style="color:var(--text);font-weight:700">${peso(totalHeld)}</span></div>`:''}
+    </div>`;
+  });
+  html += `</div>`;
+  document.getElementById('content').innerHTML = html;
+}
+
+function markPdc(id, status) {
+  const p = db.pdcs.find(x=>x.id===id);
+  if (!p) return;
+  p.status = status;
+  if (status==='deposited') p.depositedDate = today();
+  saveDB(); renderTab();
+  toast(status==='deposited'?'✓ Check marked as deposited!':status==='bounced'?'⚠ Marked as bounced.':'Check updated.');
+}
+
+function uploadPdcImage(pdcId, input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const p = db.pdcs.find(x => x.id === pdcId);
+  if (!p) return;
+  if (!p.checkImages) p.checkImages = [];
+
+  let done = 0;
+  files.forEach(file => {
+    const ext    = file.name.split('.').pop().toLowerCase();
+    const imgExts = ['jpg','jpeg','png','gif','webp'];
+    const type   = imgExts.includes(ext) ? 'img' : 'other';
+    const size   = file.size > 1024*1024
+      ? (file.size/1024/1024).toFixed(1)+' MB'
+      : (file.size/1024).toFixed(1)+' KB';
+
+  if (file.type.startsWith('image/')) {
+  compressImage(file).then(compressed => {
+    fileToBase64(compressed).then(base64 => {
+      
+      const size = file.size > 1024*1024
+        ? (file.size/1024/1024).toFixed(1)+' MB'
+        : (file.size/1024).toFixed(1)+' KB';
+
+      p.checkImages.push({
+        id: Date.now(),
+        name: file.name,
+        type,
+        size,
+        base64: base64,   
+        uploaded: new Date().toISOString().slice(0,10)
+      });
+
+      done++;
+
+      if (done === files.length) {
+        saveDB();
+        renderTab();
+        toast('✓ images saved!');
+      }
+    });
+  });
+  } else {
+    fileToBase64(file).then(base64 => {
+
+      p.checkImages.push({
+        id: Date.now(),
+        name: file.name,
+        type,
+        size,
+        base64: base64,   
+        uploaded: new Date().toISOString().slice(0,10)
+      });
+
+      done++;
+
+      if (done === files.length) {
+        saveDB();
+        renderTab();
+        toast('✓ images saved!');
+      }
+    });
+  }
+  });
+  input.value = '';
+}
+
+function deleteCheckImage(pdcId, fileId) {
+  const p = db.pdcs.find(x => x.id === pdcId);
+  if (!p) return;
+  if (!confirm('Delete this check image?')) return;
+  p.checkImages = (p.checkImages || []).filter(img => img.id !== fileId);
+  deleteFile(fileId);
+  saveDB();
+  renderTab();
+  toast('Check image deleted.');
+}
+
+function viewCheckImage(fileId, label) {
+  const pdc = db.pdcs.find(p => 
+    (p.checkImages || []).some(img => img.id == fileId)
+  );
+
+  if (!pdc) return;
+
+  const img = pdc.checkImages.find(i => i.id == fileId);
+
+  if (!img || !img.base64) {
+    toast('Image not found', true);
+    return;
+  }
+
+  document.getElementById('img-viewer-img').src = img.base64;
+  document.getElementById('img-viewer-label').textContent = label || '';
+  document.getElementById('img-viewer').style.display = 'flex';
+
+}
+
+function openPdcDetail(id) {
+  const pdc = db.pdcs.find(x=>x.id===id);
+  if (!pdc) return;
+  const b = pdcBadge(pdc.checkDate, pdc.status);
+  const imgs = pdc.checkImages || [];
+  const body = `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+    <div>
+      <div style="font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;color:var(--text)">Check #${pdc.checkNo}</div>
+      <div style="color:var(--accent);font-size:14px;font-weight:600;margin-top:3px">${pdc.tenantName} · Unit ${pdc.unit}</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-pdc-detail')">✕ Close</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+    ${[['Amount',peso(pdc.amount)],['Check Date',pdc.checkDate],['Bank',pdc.bank],['Date Received',pdc.receivedDate||'—'],['Memo / Notes',pdc.memo||'—'],['Current Status',pdc.status]].map(([k,val])=>`
+    <div style="background:var(--surface2);border-radius:10px;padding:11px 14px;border:1px solid var(--border2)">
+      <div class="sl">${k}</div><div style="font-size:14px;font-weight:600;color:var(--text);text-transform:${k==='Current Status'?'capitalize':'none'}">${val}</div>
+    </div>`).join('')}
+  </div>
+  <div class="divider"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div class="sl" style="margin-bottom:0">Check Images (${imgs.length})</div>
+    <label class="btn btn-ghost btn-sm" style="cursor:pointer">📎 Add Images
+      <input type="file" accept="image/*,application/pdf" multiple capture="environment" style="display:none" onchange="uploadPdcImage(${pdc.id},this);setTimeout(()=>openPdcDetail(${pdc.id}),600)"/>
+    </label>
+  </div>
+  ${imgs.length
+    ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:12px" id="pdc-img-gallery-${pdc.id}">
+        ${imgs.map(img=>`
+        <div style="position:relative;border-radius:8px;overflow:hidden;border:1.5px solid var(--border2);cursor:pointer;background:var(--surface2)" onclick="viewCheckImage('${img.id}','Check #${pdc.checkNo} — ${img.name}')">
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:28px">
+            ${img.type==='img'?'🖼':'📄'}
+          </div>
+          <div style="padding:4px 6px;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.name}</div>
+          <div style="font-size:10px;color:var(--muted);padding:0 6px 4px">${img.size}</div>
+          <button onclick="event.stopPropagation();deleteCheckImage(${pdc.id},'${img.id}')" style="position:absolute;top:4px;right:4px;background:rgba(220,38,38,.85);border:none;color:#fff;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+        </div>`).join('')}
+      </div>`
+    : `<label class="upload-area" style="display:block;margin-bottom:12px">
+         <div style="font-size:32px;margin-bottom:8px">📷</div>
+         <div style="color:var(--sub);font-size:14px;font-weight:600">Tap to upload check images</div>
+         <div style="color:var(--muted);font-size:12px;margin-top:4px">Multiple files supported · Camera · Gallery · PDF</div>
+         <input type="file" accept="image/*,application/pdf" multiple capture="environment" style="display:none" onchange="uploadPdcImage(${pdc.id},this);setTimeout(()=>openPdcDetail(${pdc.id}),600)"/>
+       </label>`
+  }
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    ${pdc.status==='holding'?`
+      <button class="btn btn-success btn-sm" onclick="markPdc(${pdc.id},'deposited');closeModal('modal-pdc-detail')">✓ Mark Deposited</button>
+      <button class="btn btn-danger btn-sm" onclick="markPdc(${pdc.id},'bounced');closeModal('modal-pdc-detail')">✕ Mark Bounced</button>`:''}
+    ${pdc.status==='bounced'?`<button class="btn btn-ghost btn-sm" onclick="markPdc(${pdc.id},'holding');closeModal('modal-pdc-detail')">↩ Revert to Holding</button>`:''}
+    ${isAdmin()?`<button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="deletePdc(${pdc.id})">🗑 Delete Record</button>`:''}
+  </div>`;
+  document.getElementById('modal-pdc-detail-body').innerHTML = body;
+  openModal('modal-pdc-detail');
+}
+
+function deletePdc(id) {
+  if (!isAdmin()) { toast('Only administrators can delete records.', true); return; }
+  if (!confirm('Delete this check record?')) return;
+  db.pdcs = db.pdcs.filter(p=>p.id!==id);
+  firestoreDelete('pdcs', id);
+  saveDB(); closeModal('modal-pdc-detail'); renderTab(); toast('Check deleted.');
+}
+
+function showAddPdc(preselect) {
+  _addPdcPreselect = preselect || null;
+  const opts = db.tenants.map(t=>`<option value="${t.id}" ${preselect===t.id?'selected':''}>${t.name} (Unit ${t.unit})</option>`).join('');
+  document.getElementById('modal-add-pdc-body').innerHTML = `
+  <div style="font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;margin-bottom:20px;color:var(--text)">Add Post-Dated Check</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <div style="grid-column:span 2"><div class="sl">Tenant</div><select id="ap-tenant"><option value="">— Select tenant —</option>${opts}</select></div>
+    <div><div class="sl">Check Number</div><input id="ap-checkno" placeholder="e.g. 1045"/></div>
+    <div><div class="sl">Amount (₱)</div><input id="ap-amount" type="number" placeholder="18000"/></div>
+    <div><div class="sl">Check Date</div><input id="ap-date" type="date"/></div>
+    <div><div class="sl">Date Received</div><input id="ap-recv" type="date"/></div>
+    <div style="grid-column:span 2"><div class="sl">Bank</div><input id="ap-bank" placeholder="e.g. BDO, BPI, Metrobank"/></div>
+    <div style="grid-column:span 2"><div class="sl">Memo / Notes</div><input id="ap-memo" placeholder="e.g. May rent"/></div>
+  </div>
+  <div style="margin-bottom:18px">
+    <div class="sl">Check Image (optional)</div>
+    <div id="ap-img-preview">
+      <label class="upload-area" style="display:block">
+        <div style="font-size:28px;margin-bottom:8px">📷</div>
+        <div style="color:var(--sub);font-size:14px;font-weight:600">Tap to attach check image</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:4px">Camera · Gallery · Files</div>
+        <input id="ap-file" type="file" accept="image/*" capture="environment" style="display:none" onchange="previewNewPdcImg(this)"/>
+      </label>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;justify-content:flex-end">
+    <button class="btn btn-ghost" onclick="closeModal('modal-add-pdc')">Cancel</button>
+    <button class="btn btn-primary" onclick="doAddPdc()">Add Check</button>
+  </div>`;
+  openModal('modal-add-pdc');
+}
+
+let _newPdcImage = null;
+let _newPdcFile = null; // stores actual File object for IDB
+function previewNewPdcImg(input) {
+  const file = input.files[0]; if(!file) return;
+  _newPdcFile = file; // store for IDB on save
+  const reader = new FileReader();
+  reader.onload = ev => {
+    _newPdcImage = ev.target.result;
+    document.getElementById('ap-img-preview').innerHTML = `
+    <img src="${_newPdcImage}" style="width:100%;height:150px;object-fit:cover;border-radius:10px;border:1.5px solid var(--border);margin-bottom:10px;box-shadow:var(--shadow-sm)"/>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center" onclick="openImgViewer('${_newPdcImage}','Preview')">🔍 Preview</button>
+      <label class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;cursor:pointer">↺ Replace<input type="file" accept="image/*" capture="environment" style="display:none" onchange="previewNewPdcImg(this)"/></label>
+      <button class="btn btn-danger btn-sm" onclick="_newPdcImage=null;document.getElementById('ap-img-preview').innerHTML=resetImgUpload()">✕</button>
+    </div>`;
+  };
+  reader.readAsDataURL(file);
+}
+function resetImgUpload(){
+  return `<label class="upload-area" style="display:block"><div style="font-size:28px;margin-bottom:8px">📷</div><div style="color:var(--sub);font-size:14px;font-weight:600">Tap to attach check image</div><input type="file" accept="image/*" capture="environment" style="display:none" onchange="previewNewPdcImg(this)"/></label>`;
+}
+function doAddPdc() {
+  const tenantId=+v('ap-tenant'),checkNo=v('ap-checkno'),amount=+v('ap-amount'),checkDate=v('ap-date');
+  if(!tenantId||!checkNo||!amount||!checkDate){toast('Tenant, check #, amount and date are required.',true);return;}
+  const tenant=db.tenants.find(t=>t.id===tenantId); if(!tenant) return;
+  const newPdc = {id:nextId(db.pdcs),tenantId,tenantName:tenant.name,unit:tenant.unit,checkNo,amount,checkDate,receivedDate:v('ap-recv'),bank:v('ap-bank'),memo:v('ap-memo'),status:'holding',checkImages:[]};
+  // If an image was previewed during add, save it
+  if (_newPdcFile) {
+    const fileId = makeFileId('chk_' + newPdc.id);
+    const ext = _newPdcFile.name.split('.').pop().toLowerCase();
+    const imgExts = ['jpg','jpeg','png','gif','webp'];
+    const type = imgExts.includes(ext) ? 'img' : 'other';
+    const size = _newPdcFile.size > 1024*1024 ? (_newPdcFile.size/1024/1024).toFixed(1)+' MB' : (_newPdcFile.size/1024).toFixed(1)+' KB';
+    saveFile(fileId, _newPdcFile).then(() => {
+      newPdc.checkImages.push({id:fileId,name:_newPdcFile.name,type,size,mimeType:_newPdcFile.type,uploaded:today()});
+    });
+  }
+  db.pdcs.push(newPdc);
+  _newPdcImage=null; _newPdcFile=null;
+  saveDB();
+  closeModal('modal-add-pdc');
+  // Auto-navigate to the Post-Dated Checks tab so user sees it immediately
+  switchTab(1);
+  toast('✓ Post-dated check added!');
+}
+
+// ── Open PDC image gallery (from table) ───────────────
+function openPdcImageGallery(pdcId) {
+  openPdcDetail(pdcId);
+}
+
+// ══════════════════════════════════════════════════════
+//  SETTINGS TAB (Admin only)
+// ══════════════════════════════════════════════════════
+function renderSettings() {
+  if (!isAdmin()) { renderTenants(); return; }
+  const S = stats();
+  const adminUsers = Object.entries(USERS).filter(([,d])=>d.role==='admin');
+  const staffUsers = Object.entries(USERS).filter(([,d])=>d.role==='staff');
+  const allUsers   = Object.entries(USERS);
+
+  // Build user rows grouped by role
+  function userRow(username, data) {
+    const isMe       = username === currentUser.username;
+    const isOnlyAdmin= data.role==='admin' && adminUsers.length===1;
+    const roleBadge  = data.role==='admin'
+      ? `<span style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);padding:2px 8px;border-radius:20px">Admin</span>`
+      : `<span style="font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);padding:2px 8px;border-radius:20px">Staff</span>`;
+    const avatar = data.label.charAt(0).toUpperCase();
+    const avatarBg = data.role==='admin' ? 'var(--accent)' : 'var(--green)';
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--surface2);border-radius:11px;border:1.5px solid var(--border2);margin-bottom:8px">
+      <div style="width:40px;height:40px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;flex-shrink:0">${avatar}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-weight:700;font-size:14px">${data.label}</span>
+          ${roleBadge}
+          ${isMe?`<span style="font-size:11px;color:var(--muted);font-weight:600">· You</span>`:''}
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">@${username}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-ghost btn-sm" onclick="showChangePassword('${username}')">🔑 Change Password</button>
+        ${(!isMe && !isOnlyAdmin) ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${username}')">🗑 Delete</button>` : ''}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('content').innerHTML = `
+  <div style="max-width:680px">
+    <div style="font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;color:var(--text)">Settings</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Administrator access — full control over users and data.</div>
+
+    <!-- ─── My Account ─── -->
+    <div class="card" style="padding:20px 22px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px">My Account</div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface2);border-radius:11px;border:1.5px solid var(--border2);margin-bottom:14px">
+        <div style="width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;flex-shrink:0">${currentUser.label.charAt(0).toUpperCase()}</div>
+        <div>
+          <div style="font-weight:700;font-size:15px">${currentUser.label}</div>
+          <div style="font-size:12px;color:var(--muted)">@${currentUser.username} · Administrator</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="showChangePassword('${currentUser.username}')">🔑 Change My Password</button>
+    </div>
+
+    <!-- ─── Admin Accounts ─── -->
+    <div class="card" style="padding:20px 22px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase">Admin Accounts</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${adminUsers.length} administrator${adminUsers.length!==1?'s':''} · Full access</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="showAddUser('admin')">+ Add Admin</button>
+      </div>
+      <div>${adminUsers.map(([u,d])=>userRow(u,d)).join('')}</div>
+    </div>
+
+    <!-- ─── Staff Accounts ─── -->
+    <div class="card" style="padding:20px 22px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--green);letter-spacing:.06em;text-transform:uppercase">Staff Accounts</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${staffUsers.length} staff member${staffUsers.length!==1?'s':''} · Can add & update, no deletions</div>
+        </div>
+        <button class="btn btn-success btn-sm" onclick="showAddUser('staff')">+ Add Staff</button>
+      </div>
+      ${staffUsers.length
+        ? `<div>${staffUsers.map(([u,d])=>userRow(u,d)).join('')}</div>`
+        : `<div style="padding:18px;text-align:center;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--muted);border:1.5px solid var(--border2)">No staff accounts yet. Add one to get started.</div>`
+      }
+    </div>
+
+    <!-- ─── Database Summary ─── -->
+    <div class="card" style="padding:20px 22px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px">Database Summary</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        ${[['Tenants',db.tenants.length,var_accent],['PDC Records',db.pdcs.length,var_purple],['Check Images',S.withImage,var_green],['Contract Files',db.tenants.reduce((s,t)=>s+(t.contractDocs||[]).length,0),var_purple]].map(([k,val,col])=>`
+        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;border:1px solid var(--border2)">
+          <div class="sl">${k}</div>
+          <div style="font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:${col}">${val}</div>
+        </div>`).join('')}
+      </div>
+      <div id="storage-estimate" style="font-size:12px;color:var(--muted);padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border2)">
+        💾 Calculating storage usage…
+      </div>
+    </div>
+
+    <!-- ─── Cloud Sync Status ─── -->
+    <div class="card" style="padding:20px 22px;margin-bottom:16px;border-color:${_firebaseReady?'#6ee7b7':'#dde3ed'}">
+      <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Cloud Sync</div>
+      ${_firebaseReady
+        ? `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--green-light);border-radius:10px;border:1.5px solid #6ee7b7;margin-bottom:12px">
+             <span style="font-size:20px">☁</span>
+             <div><div style="font-weight:700;color:var(--green);font-size:14px">Firebase Connected</div>
+             <div style="font-size:12px;color:var(--muted)">All data syncs in real-time across all devices</div></div>
+           </div>`
+        : `<div style="padding:14px;background:var(--yellow-light);border-radius:10px;border:1.5px solid #fcd34d;margin-bottom:12px;font-size:13px;line-height:1.7">
+             <div style="font-weight:700;color:var(--yellow);margin-bottom:6px">⚠ Cloud sync not configured</div>
+             <div style="color:var(--sub)">To enable real-time sync across all devices:</div>
+             <ol style="margin:8px 0 0 18px;color:var(--sub)">
+               <li>Go to <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent)">console.firebase.google.com</a></li>
+               <li>Create a project → Add Web App → Copy config</li>
+               <li>Open the HTML file and paste your config into <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">FIREBASE_CONFIG</code></li>
+               <li>Enable <strong>Firestore Database</strong> and <strong>Storage</strong> in the Firebase console</li>
+               <li>Set Firestore rules to allow authenticated read/write</li>
+             </ol>
+           </div>`
+      }
+    </div>
+
+    <!-- ─── Export ─── -->
+    <div class="card" style="padding:20px 22px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Export Data</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">Download a full JSON backup of all tenants and PDC records.</div>
+      <button class="btn btn-ghost" onclick="exportData()">⬇ Download Backup (JSON)</button>
+    </div>
+
+    <!-- ─── Danger Zone ─── -->
+    <div class="card" style="padding:20px 22px;border:1.5px solid #fca5a5">
+      <div style="font-size:13px;font-weight:700;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Danger Zone</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">Reset all tenant and PDC data to the default sample records. This cannot be undone.</div>
+      <button class="btn btn-danger" onclick="resetData()">⚠ Reset to Sample Data</button>
+    </div>
+  </div>`;
+  // Show storage estimate
+  if (navigator.storage && navigator.storage.estimate) {
+    navigator.storage.estimate().then(est => {
+      const el = document.getElementById('storage-estimate');
+      if (!el) return;
+      const used  = est.usage  ? (est.usage  / 1024 / 1024).toFixed(1) : '?';
+      const quota = est.quota  ? (est.quota  / 1024 / 1024 / 1024).toFixed(1) : '?';
+      const pct   = (est.usage && est.quota) ? Math.round(est.usage / est.quota * 100) : 0;
+      el.innerHTML = `💾 Storage used: <strong>${used} MB</strong> of ~${quota} GB available (${pct}%) · Powered by IndexedDB`;
+    });
+  }
+}
+
+// ── Add User (role pre-selected) ───────────────────────
+function showAddUser(defaultRole) {
+  defaultRole = defaultRole || 'staff';
+  const body = `
+  <div style="font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;margin-bottom:4px;color:var(--text)">Add New User</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Fill in the details below to create a new account.</div>
+  <div style="display:grid;gap:12px;margin-bottom:18px">
+    <div>
+      <div class="sl">Full Name</div>
+      <input id="au-label" placeholder="e.g. Maria Cruz"/>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div class="sl">Username</div>
+        <input id="au-username" placeholder="e.g. mcruz" autocomplete="off"/>
+      </div>
+      <div>
+        <div class="sl">Role</div>
+        <select id="au-role">
+          <option value="staff" ${defaultRole==='staff'?'selected':''}>Staff</option>
+          <option value="admin" ${defaultRole==='admin'?'selected':''}>Admin</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div class="sl">Password</div>
+        <input id="au-pass" type="password" placeholder="Min. 4 characters"/>
+      </div>
+      <div>
+        <div class="sl">Confirm Password</div>
+        <input id="au-pass2" type="password" placeholder="Repeat password"/>
+      </div>
+    </div>
+  </div>
+  <div style="padding:12px 14px;background:var(--accent-light);border:1.5px solid #bfcfef;border-radius:9px;font-size:13px;color:var(--sub);margin-bottom:16px">
+    <strong style="color:var(--accent)">Admin</strong> — full access including Settings, deletions, and user management.<br/>
+    <strong style="color:var(--green)">Staff</strong> — can add and update tenants and checks, but cannot delete or access Settings.
+  </div>
+  <div style="display:flex;gap:10px;justify-content:flex-end">
+    <button class="btn btn-ghost" onclick="closeModal('modal-add-user')">Cancel</button>
+    <button class="btn btn-primary" onclick="doAddUser()">Create Account</button>
+  </div>`;
+  document.getElementById('modal-add-user-body').innerHTML = body;
+  openModal('modal-add-user');
+}
+
+function doAddUser() {
+  const label    = v('au-label');
+  const username = v('au-username').toLowerCase();
+  const pass     = v('au-pass');
+  const pass2    = v('au-pass2');
+  const role     = v('au-role');
+  if (!label || !username) { toast('Name and username are required.', true); return; }
+  if (!/^[a-z0-9_]+$/.test(username)) { toast('Username: letters, numbers and underscores only.', true); return; }
+  if (USERS[username]) { toast('Username "' + username + '" already exists.', true); return; }
+  if (pass.length < 4) { toast('Password must be at least 4 characters.', true); return; }
+  if (pass !== pass2) { toast('Passwords do not match.', true); return; }
+  USERS[username] = { password: pass, role, label };
+  saveUsers();
+  closeModal('modal-add-user');
+  renderSettings();
+  toast('✓ Account "' + username + '" created as ' + (role === 'admin' ? 'Admin' : 'Staff') + '!');
+}
+
+// ── Delete User ────────────────────────────────────────
+function deleteUser(username) {
+  if (!isAdmin()) { toast('Admin access required.', true); return; }
+  const u = USERS[username];
+  if (!u) return;
+  if (username === currentUser.username) { toast('You cannot delete your own account.', true); return; }
+  const adminCount = Object.values(USERS).filter(d => d.role === 'admin').length;
+  if (u.role === 'admin' && adminCount <= 1) { toast('Cannot delete the last admin account.', true); return; }
+  if (!confirm('Delete user "' + u.label + '" (@' + username + ')? This cannot be undone.')) return;
+  delete USERS[username];
+  saveUsers();
+  renderSettings();
+  toast('User "' + username + '" deleted.');
+}
+
+// ── Change Password ─────────────────────────────────────
+function showChangePassword(username) {
+  const u = USERS[username];
+  if (!u) return;
+  const isMe = username === currentUser.username;
+  const body = `
+  <div style="font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;margin-bottom:4px;color:var(--text)">${isMe ? 'Change My Password' : 'Change Password'}</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">
+    ${isMe ? 'Update your own login password.' : 'Updating password for <strong>' + u.label + '</strong> (@' + username + ').'}
+  </div>
+  <div style="display:grid;gap:12px;margin-bottom:18px">
+    <div><div class="sl">New Password</div><input id="cp-new" type="password" placeholder="Minimum 4 characters" autocomplete="new-password"/></div>
+    <div><div class="sl">Confirm New Password</div><input id="cp-conf" type="password" placeholder="Repeat password" autocomplete="new-password"/></div>
+  </div>
+  <div style="display:flex;gap:10px;justify-content:flex-end">
+    <button class="btn btn-ghost" onclick="closeModal('modal-change-pw')">Cancel</button>
+    <button class="btn btn-primary" onclick="doChangePassword('${username}')">Update Password</button>
+  </div>`;
+  document.getElementById('modal-change-pw-body').innerHTML = body;
+  openModal('modal-change-pw');
+}
+
+function doChangePassword(username) {
+  const np = v('cp-new'), cp = v('cp-conf');
+  if (np.length < 4) { toast('Password must be at least 4 characters.', true); return; }
+  if (np !== cp) { toast('Passwords do not match.', true); return; }
+  USERS[username].password = np;
+  saveUsers();
+  closeModal('modal-change-pw');
+  renderSettings();
+  toast('✓ Password updated for ' + USERS[username].label + '!');
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify({
+    tenants: db.tenants,
+    pdcs: db.pdcs.map(p=>({...p, checkImage: p.checkImage ? '[image data]' : null}))
+  }, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'primeaxis-backup-' + today() + '.json';
+  a.click();
+  toast('✓ Backup downloaded!');
+}
+
+function resetData() {
+  if (!confirm('Reset ALL tenant and PDC data to sample records? This permanently deletes everything and cannot be undone.')) return;
+  db = { tenants: JSON.parse(JSON.stringify(SEED_TENANTS)), pdcs: JSON.parse(JSON.stringify(SEED_PDCS)) };
+  saveDB(); renderSettings(); toast('Data reset to sample records.');
+}
+
+// ══════════════════════════════════════════════════════
+//  CONTRACT DOCUMENTS
+// ══════════════════════════════════════════════════════
+function uploadContract(tenantId, input) {
+  const tenant = db.tenants.find(t => t.id === tenantId);
+  if (!tenant) return;
+  if (!tenant.contractDocs) tenant.contractDocs = [];
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  let done = 0;
+
+  files.forEach(file => {
+    const fileId  = makeFileId('doc_' + tenantId);
+    const ext     = file.name.split('.').pop().toLowerCase();
+    const imgExts = ['jpg','jpeg','png','gif','webp'];
+    const type    = ext === 'pdf' ? 'pdf' : imgExts.includes(ext) ? 'img' : 'other';
+    const size    = file.size > 1024*1024
+      ? (file.size/1024/1024).toFixed(1)+' MB'
+      : (file.size/1024).toFixed(1)+' KB';
+
+if (file.type.startsWith('image/')) {
+  compressImage(file).then(compressed => {
+    fileToBase64(compressed).then(base64 => {
+	
+      const size = file.size > 1024*1024
+        ? (file.size/1024/1024).toFixed(1)+' MB'
+        : (file.size/1024).toFixed(1)+' KB';
+	
+      tenant.contractDocs.push({
+        id: Date.now(),
+        name: file.name,
+        type,
+        size,
+        base64: base64,
+        uploaded: new Date().toISOString().slice(0,10)
+      });
+
+      done++;
+
+      if (done === files.length) {
+        saveDB();
+        openTenantDetail(tenantId);
+        toast('✓ uploaded!');
+      }
+    });
+  });
+} else {
+    fileToBase64(file).then(base64 => {
+      tenant.contractDocs.push({
+        id: Date.now(),
+        name: file.name,
+        type,
+        size,
+        base64: base64,
+        uploaded: new Date().toISOString().slice(0,10)
+      });
+
+      done++;
+
+      if (done === files.length) {
+        saveDB();
+        openTenantDetail(tenantId);
+        toast('✓ uploaded!');
+      }
+    });
+}
+
+  });
+  input.value = '';
+}
+
+function viewContract(tenantId, docIndex) {
+  const tenant = db.tenants.find(t => t.id === tenantId);
+  if (!tenant || !tenant.contractDocs[docIndex]) return;
+  const doc    = tenant.contractDocs[docIndex];
+  const viewer = document.getElementById('contract-viewer');
+  const body   = document.getElementById('cv-body');
+  const label  = document.getElementById('cv-label');
+  const dl     = document.getElementById('cv-download');
+
+  label.textContent = doc.name + ' — ' + tenant.name;
+  body.innerHTML = '<div style="padding:40px;text-align:center;color:#7a8aaa">Loading…</div>';
+  viewer.style.display = 'flex';
+
+  const url = doc.base64;
+
+    if (!url) { body.innerHTML = '<div style="padding:40px;text-align:center;color:#dc2626">File not found. It may have been stored on a different device.</div>'; return; }
+    // Store URL to revoke on close
+    viewer._revokeUrl = url;
+    dl.href = url; dl.download = doc.name;
+    if (doc.type === 'img') {
+      body.innerHTML = `<img src="${url}" style="max-width:100%;display:block;border-radius:8px"/>`;
+    } else if (doc.type === 'pdf') {
+      body.innerHTML = `<embed src="${url}" type="application/pdf" style="width:100%;height:70vh;border:none;border-radius:8px"/>`;
+    } else {
+      body.innerHTML = `<div style="padding:40px;text-align:center;color:#4a5872">
+        <div style="font-size:48px;margin-bottom:12px">📄</div>
+        <div style="font-size:16px;font-weight:600">${doc.name}</div>
+        <div style="font-size:13px;color:#7a8aaa;margin-top:6px">${doc.size}</div>
+        <a href="${url}" download="${doc.name}" style="display:inline-block;margin-top:18px;padding:10px 22px;background:#1d4ed8;color:#fff;border-radius:9px;text-decoration:none;font-weight:600;font-size:14px">⬇ Download File</a>
+      </div>`;
+    }
+
+}
+
+function closeContractViewer() {
+  const viewer = document.getElementById('contract-viewer');
+  viewer.style.display = 'none';
+  if (viewer._revokeUrl) { URL.revokeObjectURL(viewer._revokeUrl); viewer._revokeUrl = null; }
+  document.getElementById('cv-body').innerHTML = '';
+  document.getElementById('cv-download').href = '';
+}
+
+function deleteContract(tenantId, docIndex) {
+  const tenant = db.tenants.find(t => t.id === tenantId);
+  if (!tenant) return;
+  const doc = tenant.contractDocs[docIndex];
+  if (!confirm('Delete "' + doc.name + '"? This cannot be undone.')) return;
+  deleteFile(doc.id); // remove Blob from IDB
+  tenant.contractDocs.splice(docIndex, 1);
+  saveDB(); openTenantDetail(tenantId); toast('Contract file deleted.');
+}
+
+// ══════════════════════════════════════════════════════
+//  PWA — MANIFEST + SERVICE WORKER
+// ══════════════════════════════════════════════════════
+let _deferredInstallPrompt = null;
+
+function setupPWA() {
+  // Inject inline manifest
+  const manifest = {
+    name: 'Prime Axis',
+    short_name: 'Prime Axis',
+    description: 'Property Management System',
+    start_url: window.location.href,
+    display: 'standalone',
+    background_color: '#f0f4f8',
+    theme_color: '#1d4ed8',
+    orientation: 'any',
+    icons: [
+      {src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%231d4ed8"/><text y=".9em" font-size="72" x="50%" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold">PA</text></svg>', sizes:'192x192', type:'image/svg+xml'},
+      {src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%231d4ed8"/><text y=".9em" font-size="72" x="50%" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold">PA</text></svg>', sizes:'512x512', type:'image/svg+xml'},
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = url;
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+const CACHE = 'primeaxis-v1';
+self.addEventListener('install', e => {
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(clients.claim());
+});
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      const fresh = fetch(e.request).then(res => {
+        if (res && res.status===200) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c=>c.put(e.request,clone));
+        }
+        return res;
+      }).catch(()=>cached);
+      return cached || fresh;
+    })
+  );
+});`;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl  = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).catch(()=>{});
+  }
+
+  // Listen for install prompt
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    // Show banner only if not already installed and not dismissed
+    if (!sessionStorage.getItem('pa_install_dismissed')) {
+      document.getElementById('install-banner').style.display = 'flex';
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    document.getElementById('install-banner').style.display = 'none';
+    _deferredInstallPrompt = null;
+    toast('✓ Prime Axis installed on your device!');
+  });
+}
+
+function installPWA() {
+  if (!_deferredInstallPrompt) return;
+  _deferredInstallPrompt.prompt();
+  _deferredInstallPrompt.userChoice.then(r => {
+    if (r.outcome==='accepted') toast('Installing Prime Axis…');
+    _deferredInstallPrompt = null;
+    document.getElementById('install-banner').style.display='none';
+  });
+}
+
+function dismissInstall() {
+  sessionStorage.setItem('pa_install_dismissed','1');
+  document.getElementById('install-banner').style.display='none';
+}
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  loadUsers();
+  setupPWA();
+  if (checkSession()) { await startApp(); }
+  else { document.getElementById('login-screen').style.display='flex'; }
+});
+
+// ==================================
+// Base64 Upgrade
+// ==================================
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function compressImage(file, maxWidth = 800, quality = 0.7) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = e => {
+      img.src = e.target.result;
+    };
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(maxWidth / img.width, 1);
+
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(blob => {
+        resolve(blob);
+      }, 'image/jpeg', quality);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+</script>
+</body>
+</html>
