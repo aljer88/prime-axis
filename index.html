@@ -559,7 +559,7 @@ async function loadDB() {
     console.warn('Firestore load failed, using cache:', e);
     setCloudStatus('offline','☁ Offline mode');
     if (!db.tenants || !db.tenants.length) {
-      db = { tenants: JSON.parse(JSON.stringify(SEED_TENANTS)), pdcs: JSON.parse(JSON.stringify(SEED_PDCS)) };
+      db = { tenants: [], pdcs: [] };
     }
   }
 }
