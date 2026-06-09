@@ -197,8 +197,8 @@ select option{background:var(--surface);color:var(--text)}
       <div id="login-err" style="display:none;background:var(--red-light);border:1.5px solid #fca5a5;border-radius:9px;padding:11px 14px;font-size:13px;color:var(--red);margin-bottom:16px;font-weight:500"></div>
 
       <div style="margin-bottom:16px">
-        <div class="sl">USERNAME</div>
-        <input id="inp-user" type="text" placeholder="Enter your username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <div class="sl">EMAIL</div>
+        <input id="inp-user" type="text" placeholder="Enter your email" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()"/>
       </div>
       <div style="margin-bottom:24px">
         <div class="sl">PASSWORD</div>
@@ -207,8 +207,6 @@ select option{background:var(--surface);color:var(--text)}
       <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:15px" onclick="doLogin()">Sign In →</button>
 
       <div style="margin-top:22px;padding:14px 16px;background:var(--accent-light);border:1.5px solid #bfcfef;border-radius:10px;font-size:13px;color:var(--sub);line-height:1.8">
-        <div style="color:var(--accent);margin-bottom:4px;font-size:11px;font-weight:700;letter-spacing:.08em">DEFAULT CREDENTIALS</div>
-        Admin: <span style="color:var(--text);font-weight:600">admin</span> / <span style="color:var(--text);font-weight:600">admin123</span><br/>
         <span style="font-size:12px;color:var(--muted)">Staff accounts are managed by the administrator.</span>
       </div>
     </div>
