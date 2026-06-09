@@ -417,9 +417,11 @@ async function initFirebase() {
     await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
     await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js');
     await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js');
+	await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js');
     const app = firebase.initializeApp(FIREBASE_CONFIG);
     _fsdb    = firebase.firestore();
     _fstore  = firebase.storage();
+	const auth = firebase.auth();
     // Enable offline persistence (Firestore caches locally for offline)
     await _fsdb.enablePersistence({synchronizeTabs: true}).catch(()=>{});
     _firebaseReady = true;
@@ -654,27 +656,46 @@ async function firestoreDelete(collection, id) {
 
 // ── Auth ───────────────────────────────────────────────
 function doLogin() {
-  const u = document.getElementById('inp-user').value.trim().toLowerCase();
-  const p = document.getElementById('inp-pass').value;
-  const err = document.getElementById('login-err');
-  if (!USERS[u] || USERS[u].password !== p) {
-    err.style.display = 'block';
-    err.textContent = 'Invalid username or password. Please try again.';
-    document.getElementById('inp-pass').value = '';
-    return;
-  }
-  err.style.display = 'none';
-  currentUser = { username: u, ...USERS[u] };
-  sessionStorage.setItem('pa_session', JSON.stringify(currentUser));
-  startApp(); // async — IDB loads before render
+  const email = document.getElementById('inp-user').value.trim().toLowerCase();
+  const password = document.getElementById('inp-pass').value;
+  
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      startApp();
+    })
+    .catch(error => {
+      document.getElementById('login-err').style.display = 'block';
+      document.getElementById('login-err').textContent = error.message;
+    });
+  
+  
+   firebase.auth().onAuthStateChanged(async (user) => {
+    if (!user) return;
+
+    const doc = await _fsdb.collection('users')
+      .doc(user.uid)
+      .get();
+
+    if (doc.exists) {
+      const data = doc.data();
+
+      currentUser = {
+        uid: user.uid,
+        email: user.email,
+        role: data.role,
+        label: data.label
+      };
+
+      startApp();
+    } else {
+      alert("User not configured. Contact admin.");
+    }
+  });
+
+
 }
 function doLogout() {
-  sessionStorage.removeItem('pa_session');
-  currentUser = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('inp-user').value = '';
-  document.getElementById('inp-pass').value = '';
+  firebase.auth().signOut();
 }
 function checkSession() {
   try {
@@ -697,7 +718,7 @@ async function startApp() {
   }
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-  document.getElementById('hdr-user').textContent = currentUser.label + ' (' + currentUser.username + ')';
+  document.getElementById('hdr-user').textContent = currentUser.label + ' (' + currentUser.email + ')';
 
   const admin = isAdmin();
 
@@ -1521,7 +1542,7 @@ function renderSettings() {
 
   // Build user rows grouped by role
   function userRow(username, data) {
-    const isMe       = username === currentUser.username;
+    const isMe       = username === currentUser.email;
     const isOnlyAdmin= data.role==='admin' && adminUsers.length===1;
     const roleBadge  = data.role==='admin'
       ? `<span style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);padding:2px 8px;border-radius:20px">Admin</span>`
@@ -1558,10 +1579,10 @@ function renderSettings() {
         <div style="width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;flex-shrink:0">${currentUser.label.charAt(0).toUpperCase()}</div>
         <div>
           <div style="font-weight:700;font-size:15px">${currentUser.label}</div>
-          <div style="font-size:12px;color:var(--muted)">@${currentUser.username} · Administrator</div>
+          <div style="font-size:12px;color:var(--muted)">@${currentUser.email} · Administrator</div>
         </div>
       </div>
-      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="showChangePassword('${currentUser.username}')">🔑 Change My Password</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="showChangePassword('${currentUser.email}')">🔑 Change My Password</button>
     </div>
 
     <!-- ─── Admin Accounts ─── -->
@@ -1726,7 +1747,7 @@ function deleteUser(username) {
   if (!isAdmin()) { toast('Admin access required.', true); return; }
   const u = USERS[username];
   if (!u) return;
-  if (username === currentUser.username) { toast('You cannot delete your own account.', true); return; }
+  if (username === currentUser.email) { toast('You cannot delete your own account.', true); return; }
   const adminCount = Object.values(USERS).filter(d => d.role === 'admin').length;
   if (u.role === 'admin' && adminCount <= 1) { toast('Cannot delete the last admin account.', true); return; }
   if (!confirm('Delete user "' + u.label + '" (@' + username + ')? This cannot be undone.')) return;
@@ -1740,7 +1761,7 @@ function deleteUser(username) {
 function showChangePassword(username) {
   const u = USERS[username];
   if (!u) return;
-  const isMe = username === currentUser.username;
+  const isMe = username === currentUser.email;
   const body = `
   <div style="font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;margin-bottom:4px;color:var(--text)">${isMe ? 'Change My Password' : 'Change Password'}</div>
   <div style="font-size:13px;color:var(--muted);margin-bottom:20px">
@@ -1993,7 +2014,16 @@ function installPWA() {
 }
 
 function dismissInstall() {
-  sessionStorage.setItem('pa_install_dismissed','1');
+  
+  firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+      currentUser = user;
+      startApp();
+    } else {
+      document.getElementById('login-screen').style.display = 'flex';
+    }
+  });
+
   document.getElementById('install-banner').style.display='none';
 }
 
