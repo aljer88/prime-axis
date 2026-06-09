@@ -1557,33 +1557,6 @@ function renderSettings() {
       <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="showChangePassword('${currentUser.email}')">🔑 Change My Password</button>
     </div>
 
-    <!-- ─── Admin Accounts ─── -->
-    <div class="card" style="padding:20px 22px;margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase">Admin Accounts</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">${adminUsers.length} administrator${adminUsers.length!==1?'s':''} · Full access</div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="showAddUser('admin')">+ Add Admin</button>
-      </div>
-      <div>${adminUsers.map(([u,d])=>userRow(u,d)).join('')}</div>
-    </div>
-
-    <!-- ─── Staff Accounts ─── -->
-    <div class="card" style="padding:20px 22px;margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--green);letter-spacing:.06em;text-transform:uppercase">Staff Accounts</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">${staffUsers.length} staff member${staffUsers.length!==1?'s':''} · Can add & update, no deletions</div>
-        </div>
-        <button class="btn btn-success btn-sm" onclick="showAddUser('staff')">+ Add Staff</button>
-      </div>
-      ${staffUsers.length
-        ? `<div>${staffUsers.map(([u,d])=>userRow(u,d)).join('')}</div>`
-        : `<div style="padding:18px;text-align:center;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--muted);border:1.5px solid var(--border2)">No staff accounts yet. Add one to get started.</div>`
-      }
-    </div>
-
     <!-- ─── Database Summary ─── -->
     <div class="card" style="padding:20px 22px;margin-bottom:16px">
       <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px">Database Summary</div>
