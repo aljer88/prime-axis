@@ -667,32 +667,6 @@ function doLogin() {
       document.getElementById('login-err').style.display = 'block';
       document.getElementById('login-err').textContent = error.message;
     });
-  
-  
-   firebase.auth().onAuthStateChanged(async (user) => {
-    if (!user) return;
-
-    const doc = await _fsdb.collection('users')
-      .doc(user.uid)
-      .get();
-
-    if (doc.exists) {
-      const data = doc.data();
-
-      currentUser = {
-        uid: user.uid,
-        email: user.email,
-        role: data.role,
-        label: data.label
-      };
-
-      startApp();
-    } else {
-      alert("User not configured. Contact admin.");
-    }
-  });
-
-
 }
 function doLogout() {
   firebase.auth().signOut();
@@ -1690,8 +1664,8 @@ function showAddUser(defaultRole) {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div>
-        <div class="sl">Username</div>
-        <input id="au-username" placeholder="e.g. mcruz" autocomplete="off"/>
+        <div class="sl">Email</div>
+		<input id="inp-user">
       </div>
       <div>
         <div class="sl">Role</div>
@@ -2033,8 +2007,32 @@ function dismissInstall() {
 window.addEventListener('DOMContentLoaded', async () => {
   loadUsers();
   setupPWA();
-  if (checkSession()) { await startApp(); }
-  else { document.getElementById('login-screen').style.display='flex'; }
+ 
+  await initFirebase();
+
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (user) {
+      const doc = await _fsdb.collection('users').doc(user.uid).get();
+
+      if (doc.exists) {
+        const data = doc.data();
+
+        currentUser = {
+          uid: user.uid,
+          email: user.email,
+          role: data.role,
+          label: data.label
+        };
+
+        await startApp();
+      } else {
+        alert("User not configured in Firestore.");
+        firebase.auth().signOut();
+      }
+    } else {
+      document.getElementById('login-screen').style.display = 'flex';
+    }
+  });
 });
 
 // ==================================
