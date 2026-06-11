@@ -431,6 +431,7 @@ async function initFirebase() {
     console.warn('[PrimeAxis] Firebase init failed:', e);
     setCloudStatus('error','☁ Sync error');
   }
+  _firebaseReady = true;
 }
 
 function loadScript(src) {
@@ -654,6 +655,17 @@ async function firestoreDelete(collection, id) {
 
 // ── Auth ───────────────────────────────────────────────
 function doLogin() {
+
+  if (!navigator.onLine) {
+    toast("No internet connection", true);
+    return;
+  }
+
+  if (!_firebaseReady) {
+    toast("App still loading. Please wait...", true);
+    return;
+  }
+
   const email = document.getElementById('inp-user').value.trim().toLowerCase();
   const password = document.getElementById('inp-pass').value;
   
